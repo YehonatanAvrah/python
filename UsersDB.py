@@ -21,7 +21,7 @@ class Users:
         str1 += " " + self.__lastname + " TEXT    NOT NULL ,"
         str1 += " " + self.__username + " TEXT    NOT NULL ,"
         str1 += " " + self.__password + " TEXT    NOT NULL ,"
-        str1 += " " + self.__wins + " TEXT    NOT NULL)"
+        str1 += " " + self.__wins + " INTEGER    NOT NULL)"
         conn.execute(str1)
         print("Table created successfully")
         conn.commit()
