@@ -1,90 +1,133 @@
 import socket
 import threading
-from Users import *
+from UsersDB import *
+
+SIZE = 8
 
 
 class Server:
     def __init__(self, ip, port):
         self.ip = ip
         self.port = port
+        self.addr = (self.ip, self.port)
         self.count = 0
         self.running = True
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)   # Create a TCP/IP socket
+        self.format = 'utf-8'
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Create a TCP/IP socket
+        self.userDb = Users()
 
-        self.userDb = User()
-
-    def start(self):
+    def start_server(self):
         try:
-            print('server starting up on ip %s port %s' % (self.ip, self.port))
-            self.sock.bind((self.ip, self.port))
-            self.sock.listen(3)
+            print('[STARTING SERVER...]')
+            server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create socket
+            server_socket.bind(self.addr)  # bind to port number
+            server_socket.listen(1)  # server listens to one client at a time
+            print(f"[LISTENING...] Server is listening on {self.addr}")
 
             while True:
-                print('waiting for a new client')
-                client_socket, client_addresses = self.sock.accept()
-                print('new client entered')
-                client_socket.send('Hello this is server'.encode())
+                print("Waiting for a client")
+                client_socket, address = server_socket.accept()  # creating connection with client
+                self.conn_handler(client_socket)
+                print("New client connected")
+                self.send_msg("Connection with server successfully established", client_socket)
                 self.count += 1
                 print(self.count)
-                self.conn_handler(client_socket)
 
         except socket.error as e:
             print(e)
+
+    def send_msg(self, data, client_socket):
+        try:
+            print("The message is: " + str(data))
+            length = str(len(data)).zfill(SIZE)
+            length = length.encode(self.format)
+            print(length)
+            if type(data) != bytes:
+                data = data.encode()
+            print(data)
+            msg = length + data
+            print("message with length is " + str(msg))
+            client_socket.send(msg)
+        except:
+            print("Error with sending msg")
+
+    def recv_msg(self, client_socket, ret_type="string"):  # ret_type is string by default unless stated otherwise
+        try:
+            length = client_socket.recv(SIZE).decode(self.format)
+            if not length:
+                print("NO LENGTH!")
+                return None
+            print("The length is " + length)
+            data = client_socket.recv(int(length))  # .decode(self.format)
+            if not data:
+                print("NO DATA!")
+                return None
+            print("The data is: " + str(data))
+            if ret_type == "string":
+                data = data.decode(self.format)
+            print(data)
+            return data
+        except:
+            print("Error with receiving msg")
 
     def conn_handler(self, client_socket):
         client_handler = threading.Thread(target=self.handle_client, args=(client_socket,))
         client_handler.start()
 
     def handle_client(self, client_socket):
-        not_crash = True
-        print(not_crash)
-        while self.running:
-            while not_crash:
-                try:
-                    server_data = client_socket.recv(1024).decode('utf-8')
-                    # insert,email,password,firstname
-                    arr = server_data.split(",")
-                    print(server_data)
+        running = True
+        print(running)
+        while running:
+            try:
+                server_data = self.recv_msg(client_socket)
+                arr = server_data.split(",")
+                print(server_data)
+                print(arr)
+                cmd = arr[0]
+                if arr and cmd == "register" and len(arr) == 4:
+                    print("Register")
+                    print(arr)
+                    server_data = self.userDb.insert_user(arr[1], arr[2], arr[3])
+                    print("server data:", server_data)
+                    if server_data:
+                        self.send_msg("Successfully registered", client_socket)
+                    elif not server_data:
+                        self.send_msg("EROR>>> Failed to register", client_socket)
 
-                    if arr and arr[0] == "register" and len(arr) == 4:
-                        print("register user")
-                        print(arr)
-                        server_data = self.userDb.insert_user(arr[1], arr[2], arr[3])
-                        print("server data:", server_data)
-                        if server_data:
-                            client_socket.send("success register".encode())
-                        elif server_data:
-                            client_socket.send("failed register".encode())
+                elif arr and cmd == "login" and len(arr) == 3:
+                    print("login")
+                    print(arr)
+                    server_data = self.userDb.ret_user_by_email_and_pswrd(arr[1], arr[2])
+                    print("server data:", server_data)
+                    if server_data:
+                        msg = "Logged in successfully, Welcome back " + str(server_data)
+                        print(msg)
+                        self.send_msg(msg, client_socket)
+                    elif not server_data:
+                        print("EROR>>> Failed to login")
+                        err_msg = "Failed to log in, please register if you don't have an account"
+                        print(err_msg)
+                        self.send_msg(err_msg, client_socket)
 
-                    elif arr and arr[0] == "login" and len(arr) == 3:
-                        print("user logging in")
-                        print(arr)
-                        server_data = self.userDb.return_user_by_email(arr[1], arr[2])
-                        print("server data:", server_data)
-                        if server_data:
-                            msg = "Logged in successfully, Welcome back " + str(server_data)
-                            print(msg)
-                            client_socket.send(msg.encode())
-                        elif not server_data:
-                            client_socket.send("Failed to log in, please register if you don't have an account".encode())
+                elif arr and cmd == "exit" and len(arr) == 1:
+                    print("exit")
+                    running = False  # change the variable to exit the loop
+                    server_data = "You've successfully disconnected"
+                    self.send_msg(server_data, client_socket)
 
-                    elif arr and arr[0] == "get_all_users" and len(arr) == 1:
-                        print("get_all_users")
-                        server_data = self.userDb.select_all_users()
-                        server_data = ",".join(server_data)  # convert data to string
-                        client_socket.send(server_data.encode())
+                else:  # if the data from the client is false according to the protocol
+                    server_data = "Please send data according to protocol"
+                    self.send_msg(server_data, client_socket)
+                print("server sends>>> " + server_data)
 
-                    else:
-                        server_data = "There was an error"
-                        client_socket.send(server_data.encode())
-                except:
-                    print("error")
-                    not_crash = False
-                    break
+            except socket.error as e:
+                print(e)
+                running = False
+                break
 
 
 if __name__ == '__main__':
-    ip = '127.0.0.1'
+    ip = '127.0.0.1'  # 127.0.0.1 means that it's this pc
     port = 1956
-    s = Server(ip, port)
-    s.start()
+    S = Server(ip, port)
+    S.start_server()

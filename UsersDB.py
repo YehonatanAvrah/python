@@ -130,7 +130,7 @@ class Users:
         return "The name of the table is " + self.__tablename
 
 
-u = Users()
+# u = Users()
 # u.insert_user('Johnny@gmail.com', "Johnny", "Av", "JohnnyAV", "pass123")
 # u.insert_user('Ron@gmail.com', "Ron", "Ha", "Ron9", "1212")
 # u.insert_user('Dori@gmail.com', "Dori", "Do", "Doriking", "1234")

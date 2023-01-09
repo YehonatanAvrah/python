@@ -18,6 +18,8 @@ class MainWindow(tkinter.Tk):  # create a window
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.handle_thread_socket()
 
+        self.icon = PhotoImage(file="Snakes and ladders icon.png")
+        MainWindow.iconphoto(False, self.icon)
         self.img = Image.open('../phase5/anya.jpg')
         self.resize = self.img.resize((1200, 720), Image.LANCZOS)
         self.bg = ImageTk.PhotoImage(self.resize)
