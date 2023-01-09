@@ -130,7 +130,7 @@ class Users:
         return "The name of the table is " + self.__tablename
 
 
-u = Users()
+# u = Users()
 # u.insert_user('Johnny@gmail.com', "Johnny", "Av", "JohnnyAV", "pass123")
 # u.insert_user('Ron@gmail.com', "Ron", "Ha", "Ron9", "1212")
 # u.insert_user('Dori@gmail.com', "Dori", "Do", "Doriking", "1234")
@@ -140,5 +140,4 @@ u = Users()
 # u.ret_user_by_email_and_pswrd('Ron@gmail.com', "1212")
 # u.update_user(3, "NewDori@gmail.com", "NewDoriking", "12345")
 # u.delete_user_by_id(4)
-u.get_all_users()
-
+# u.get_all_users()
