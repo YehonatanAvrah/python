@@ -1,6 +1,6 @@
 import socket
 import threading
-from UsersDB import *
+from Cyber.ProjectSAL.Databases.UsersDB import *
 
 SIZE = 8
 
@@ -13,7 +13,7 @@ class Server:
         self.count = 0
         self.running = True
         self.format = 'utf-8'
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Create a TCP/IP socket
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Create a socket
         self.userDb = Users()
 
     def start_server(self):
@@ -21,7 +21,7 @@ class Server:
             print('[STARTING SERVER...]')
             server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create socket
             server_socket.bind(self.addr)  # bind to port number
-            server_socket.listen(1)  # server listens to one client at a time
+            server_socket.listen(1)  # server listens to X client at a time
             print(f"[LISTENING...] Server is listening on {self.addr}")
 
             while True:
@@ -80,6 +80,7 @@ class Server:
         while running:
             try:
                 server_data = self.recv_msg(client_socket)
+                print(server_data)
                 arr = server_data.split(",")
                 print(server_data)
                 print(arr)
@@ -118,7 +119,7 @@ class Server:
                 else:  # if the data from the client is false according to the protocol
                     server_data = "Please send data according to protocol"
                     self.send_msg(server_data, client_socket)
-                print("server sends>>> " + server_data)
+                # print("server sends>>> " + server_data)
 
             except socket.error as e:
                 print(e)
