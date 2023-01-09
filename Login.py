@@ -19,7 +19,7 @@ class MainWindow(tkinter.Tk):  # create a window
         self.handle_thread_socket()
 
         self.img = Image.open('../phase5/anya.jpg')
-        self.resize = self.img.resize((1200, 720), Image.Resampling.LANCZOS)
+        self.resize = self.img.resize((1200, 720), Image.LANCZOS)
         self.bg = ImageTk.PhotoImage(self.resize)
         self.imgLabel = Label(self, image=self.bg)
         self.imgLabel.pack(expand=YES)
