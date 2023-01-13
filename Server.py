@@ -85,15 +85,15 @@ class Server:
                 print(server_data)
                 print(arr)
                 cmd = arr[0]
-                if arr and cmd == "register" and len(arr) == 4:
+                if arr and cmd == "register" and len(arr) == 6:
                     print("Register")
                     print(arr)
-                    server_data = self.userDb.insert_user(arr[1], arr[2], arr[3])
+                    server_data = self.userDb.insert_user(arr[1], arr[2], arr[3], arr[4], arr[5])
                     print("server data:", server_data)
                     if server_data:
-                        self.send_msg("Successfully registered", client_socket)
+                        self.send_msg("Successfully registered!", client_socket)
                     elif not server_data:
-                        self.send_msg("EROR>>> Failed to register", client_socket)
+                        self.send_msg("EROR>>> Failed to register user", client_socket)
 
                 elif arr and cmd == "login" and len(arr) == 3:
                     print("login")
