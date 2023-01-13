@@ -14,10 +14,11 @@ class Register(tkinter.Toplevel):
         self.client_handler = None
         self.parent = parent
         self.geometry("1200x720")
-        self.title('add user/register')
+        self.title('Registration')
         self.format = 'utf-8'
 
         self.img = Image.open('../Photos/Anya2.jpg')
+        # self.resizable(width=False, height=False)
         self.resize = self.img.resize((1200, 720), Image.Resampling.LANCZOS)
         self.bg = ImageTk.PhotoImage(self.resize)
         self.imgLabel = Label(self, image=self.bg)
@@ -26,32 +27,48 @@ class Register(tkinter.Toplevel):
         self.UsersDB = Users()
 
         self.create_gui()
-        # Button(self, text='Close', command=self.close).pack(expand=True, side=BOTTOM)
 
     def create_gui(self):
-        self.EmailP = StringVar()
-        self.Email = Label(self, text="Email: ", width=10, font=self.LblFont)  # place a label on the window
-        self.Email.place(x=100, y=25)
-        self.EntEmail = Entry(self, textvariable=self.EmailP, font=self.LblFont)
+        self.Email = StringVar()
+        self.EmailLbl = Label(self, text="Email: ", width=10, font=self.LblFont)  # place a label on the window
+        self.EmailLbl.place(x=100, y=25)
+        self.EntEmail = Entry(self, textvariable=self.Email, font=self.LblFont)
         self.EntEmail.place(x=225, y=25)
 
-        self.PasswordP = StringVar()
-        self.Password = Label(self, text="Password: ", width=10, font=self.LblFont)  # place a label on the window
-        self.Password.place(x=100, y=75)
-        self.EntPass = Entry(self, textvariable=self.PasswordP, font=self.LblFont)
+        self.Password = StringVar()
+        self.PasswordLbl = Label(self, text="Password: ", width=10, font=self.LblFont)  # place a label on the window
+        self.PasswordLbl.place(x=100, y=75)
+        self.EntPass = Entry(self, show='*', textvariable=self.Password, font=self.LblFont)
         self.EntPass.place(x=225, y=75)
 
-        self.FNameP = StringVar()
-        self.FName = Label(self, text="First Name: ", width=10, font=self.LblFont)  # place a label on the window
-        self.FName.place(x=100, y=125)
-        self.EntFName = Entry(self, textvariable=self.FNameP, font=self.LblFont)
+        self.FName = StringVar()
+        self.FNameLbl = Label(self, text="First Name: ", width=10, font=self.LblFont)  # place a label on the window
+        self.FNameLbl.place(x=100, y=125)
+        self.EntFName = Entry(self, textvariable=self.FName, font=self.LblFont)
         self.EntFName.place(x=225, y=125)
 
+        self.LName = StringVar()
+        self.LNameLbl = Label(self, text="Last Name: ", width=10, font=self.LblFont)  # place a label on the window
+        self.LNameLbl.place(x=100, y=175)
+        self.EntLName = Entry(self, textvariable=self.LName, font=self.LblFont)
+        self.EntLName.place(x=225, y=175)
+
+        self.Username = StringVar()
+        self.UsernameLbl = Label(self, text="Username: ", width=10, font=self.LblFont)  # place a label on the window
+        self.UsernameLbl.place(x=100, y=225)
+        self.EntUsername = Entry(self, textvariable=self.Username, font=self.LblFont)
+        self.EntUsername.place(x=225, y=225)
+
+        self.SucReg = StringVar()
+        self.SucReg.set("Please Enter Information To Register")
+        self.SucRegLbl = Label(self, textvariable=self.SucReg, font=self.LblFont, background="yellow")
+        self.SucRegLbl.place(x=100, y=325)
+
         self.button_reg = Button(self, text="Register", command=self.handle_add_user, font=self.LblFont, background="green")
-        self.button_reg.place(x=100, y=175)
+        self.button_reg.place(x=100, y=275)
 
         self.btn_close = Button(self, text="Close", command=self.close, background="yellow", font=self.LblFont)
-        self.btn_close.place(x=200, y=175)
+        self.btn_close.place(x=200, y=275)
 
     def handle_add_user(self):
         self.client_handler = threading.Thread(target=self.register_user, args=())
@@ -60,47 +77,22 @@ class Register(tkinter.Toplevel):
 
     def register_user(self):
         print("register")
-        arr = ["register", self.EmailP.get(), self.PasswordP.get(), self.FNameP.get()]
+        arr = ["register", self.Email.get(), self.FName.get(), self.LName.get(), self.Username.get(),
+               self.Password.get()]
         str_insert = ",".join(arr)
         print(str_insert)
-        self.parent.client_socket.send(str_insert.encode())
-        data = self.parent.client_socket.recv(1024).decode()
+        self.parent.send_msg(str_insert, self.parent.client_socket)
+        data = self.parent.recv_msg(self.parent.client_socket)
+        self.SucReg.set(data)
+        self.EntEmail.delete(0, END)
+        self.EntPass.delete(0, END)
+        self.EntFName.delete(0, END)
+        self.EntLName.delete(0, END)
+        self.EntUsername.delete(0, END)
         print(data)
 
     def close(self):
         self.parent.deiconify()  # show parent
         self.destroy()  # close and destroy this screen
 
-    def send_msg(self, data, client_socket):
-        try:
-            print("The message is: " + str(data))
-            length = str(len(data)).zfill(SIZE)
-            length = length.encode(self.format)
-            print(length)
-            if type(data) != bytes:
-                data = data.encode()
-            print(data)
-            msg = length + data
-            print("message with length is " + str(msg))
-            client_socket.send(msg)
-        except:
-            print("Error with sending msg")
 
-    def recv_msg(self, client_socket, ret_type="string"):  # ret_type is string by default unless stated otherwise
-        try:
-            length = client_socket.recv(SIZE).decode(self.format)
-            if not length:
-                print("NO LENGTH!")
-                return None
-            print("The length is " + length)
-            data = client_socket.recv(int(length))  # .decode(self.format)
-            if not data:
-                print("NO DATA!")
-                return None
-            print("The data is: " + str(data))
-            if ret_type == "string":
-                data = data.decode(self.format)
-            print(data)
-            return data
-        except:
-            print("Error with receiving msg")

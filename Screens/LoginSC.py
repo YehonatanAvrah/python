@@ -29,21 +29,21 @@ class MainWindow(tkinter.Tk):  # create a window
         self.imgLabel = Label(self, image=self.bg)
         self.imgLabel.pack(expand=YES)
 
-        self.EmailP = StringVar()
-        self.Email = Label(self, text="Email: ", width=10, font=self.LblFont)  # place a label on the window
-        self.Email.place(x=100, y=25)
-        self.EntEmail = Entry(self, textvariable=self.EmailP, font=self.LblFont)
+        self.Email = StringVar()
+        self.EmailLbl = Label(self, text="Email: ", width=10, font=self.LblFont)  # place a label on the window
+        self.EmailLbl.place(x=100, y=25)
+        self.EntEmail = Entry(self, textvariable=self.Email, font=self.LblFont)
         self.EntEmail.place(x=225, y=25)
 
-        self.PasswordP = StringVar()
-        self.Password = Label(self, text="Password: ", width=10, font=self.LblFont)  # place a label on the window
-        self.Password.place(x=100, y=75)
-        self.EntPass = Entry(self, show='*', textvariable=self.PasswordP, font=self.LblFont)
+        self.Password = StringVar()
+        self.PasswordLbl = Label(self, text="Password: ", width=10, font=self.LblFont)  # place a label on the window
+        self.PasswordLbl.place(x=100, y=75)
+        self.EntPass = Entry(self, show='*', textvariable=self.Password, font=self.LblFont)
         self.EntPass.place(x=225, y=75)
 
         self.UserData = StringVar()
-        self.UserData.set("Please Login to enter the game ")
-        self.UserDataLbl = Label(textvariable=self.UserData, font=self.LblFont, background="yellow")
+        self.UserData.set("Please Login To Enter The Game")
+        self.UserDataLbl = Label(self, textvariable=self.UserData, font=self.LblFont, background="yellow")
         self.UserDataLbl.place(x=100, y=125)
 
         self.btn_submit = Button(self, text="Login", command=self.login, background="lime", font=self.LblFont)
@@ -65,7 +65,7 @@ class MainWindow(tkinter.Tk):  # create a window
     def login(self):
         try:
             print("[logging in...]")
-            arr = ["login", self.EmailP.get(), self.PasswordP.get()]
+            arr = ["login", self.Email.get(), self.Password.get()]
             str_insert = ",".join(arr)
             print(str_insert)
             self.send_msg(str_insert, self.client_socket)

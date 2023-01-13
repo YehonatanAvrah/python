@@ -49,7 +49,8 @@ class Users:
         try:
             conn = sqlite3.connect('Users.db')
             print("Opened database successfully") # check if worked
-            strsql = f"SELECT * from {self.__tablename} where {self.__email} = '{str(email)}' AND {self.__password} = '{str(pswrd)}'"
+            strsql = f"SELECT * from {self.__tablename} where {self.__email} = '{str(email)}' AND " \
+                     f"{self.__password} = '{str(pswrd)}'"
             print(strsql)
             cursor = conn.execute(strsql)
             print(cursor)
@@ -131,11 +132,11 @@ class Users:
         return "The name of the table is " + self.__tablename
 
 
-u = Users()
-u.insert_user('Johnny@gmail.com', "Johnny", "Av", "JohnnyAV", "pass123")
-u.insert_user('Ron@gmail.com', "Ron", "Ha", "Ron9", "1212")
-u.insert_user('Dori@gmail.com', "Dori", "Do", "Doriking", "1234")
-u.insert_user('Michal@gmail.com', "Michal", "kl", "Micha8l", "M12")
+# u = Users()
+# u.insert_user('Johnny@gmail.com', "Johnny", "Av", "JohnnyAV", "pass123")
+# u.insert_user('Ron@gmail.com', "Ron", "Ha", "Ron9", "1212")
+# u.insert_user('Dori@gmail.com', "Dori", "Do", "Doriking", "1234")
+# u.insert_user('Michal@gmail.com', "Michal", "kl", "Micha8l", "M12")
 # u.get_all_users()
 # u.get_all_wins("Johnny@gmail.com")
 # u.ret_user_by_email_and_pswrd('Ron@gmail.com', "1212")
