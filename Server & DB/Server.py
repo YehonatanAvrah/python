@@ -1,6 +1,6 @@
 import socket
 import threading
-from Cyber.ProjectSAL.Databases.UsersDB import *
+from UsersDB import *
 
 SIZE = 8
 

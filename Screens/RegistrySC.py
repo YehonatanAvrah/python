@@ -3,7 +3,6 @@ import tkinter
 from tkinter import *
 import tkinter.font as font
 from PIL import ImageTk, Image
-from Cyber.ProjectSAL.Databases.UsersDB import Users
 
 SIZE = 8
 
@@ -24,7 +23,7 @@ class Register(tkinter.Toplevel):
         self.imgLabel = Label(self, image=self.bg)
         self.imgLabel.pack(expand=YES)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold")
-        self.UsersDB = Users()
+
 
         self.create_gui()
 
