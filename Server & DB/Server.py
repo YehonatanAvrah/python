@@ -114,6 +114,7 @@ class Server:
                     print("exit")
                     running = False  # change the variable to exit the loop
                     server_data = "You've successfully disconnected"
+                    self.count -= 1
                     self.send_msg(server_data, client_socket)
 
                 else:  # if the data from the client is false according to the protocol
