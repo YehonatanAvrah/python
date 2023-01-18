@@ -80,6 +80,8 @@ class Server:
         while running:
             try:
                 server_data = self.recv_msg(client_socket)
+                if server_data is None:
+                    break
                 print(server_data)
                 arr = server_data.split(",")
                 print(server_data)
@@ -126,6 +128,7 @@ class Server:
                 print(e)
                 running = False
                 break
+        client_socket.close()
 
 
 if __name__ == '__main__':
