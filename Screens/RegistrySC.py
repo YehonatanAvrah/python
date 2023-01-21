@@ -24,7 +24,6 @@ class Register(tkinter.Toplevel):
         self.imgLabel.pack(expand=YES)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold")
 
-
         self.create_gui()
 
     def create_gui(self):

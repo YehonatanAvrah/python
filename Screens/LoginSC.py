@@ -6,6 +6,7 @@ import tkinter.font as font
 from PIL import ImageTk, Image
 from tkinter.messagebox import showerror
 from RegistrySC import Register
+from MenuSC import Menu
 
 SIZE = 8
 
@@ -62,6 +63,11 @@ class MainWindow(tkinter.Tk):  # create a window
         window.grab_set()
         self.withdraw()
 
+    def open_menu(self):
+        window = Menu(self)
+        window.grab_set()
+        self.withdraw()
+
     def login(self):
         try:
             print("[logging in...]")
@@ -70,6 +76,8 @@ class MainWindow(tkinter.Tk):  # create a window
             print(str_insert)
             self.send_msg(str_insert, self.client_socket)
             data = self.recv_msg(self.client_socket)
+            if data[0] == "L":
+                self.open_menu()
             self.UserData.set(data)
             print(data)
             return data
