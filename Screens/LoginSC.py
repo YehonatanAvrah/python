@@ -42,6 +42,15 @@ class MainWindow(tkinter.Tk):  # create a window
         self.EntPass = Entry(self, show='*', textvariable=self.Password, font=self.LblFont)
         self.EntPass.place(x=225, y=75)
 
+        self.ShowIcon = Image.open('../photos/Show.png')
+        self.ShowIconResize = self.ShowIcon.resize((35, 35), Image.Resampling.LANCZOS)
+        self.ShowEye = ImageTk.PhotoImage(self.ShowIconResize)
+        self.HideIcon = Image.open('../photos/Hide.png')
+        self.HideIconResize = self.HideIcon.resize((35, 35), Image.Resampling.LANCZOS)
+        self.HideEye = ImageTk.PhotoImage(self.HideIconResize)
+        self.ShowHidePass = Button(self, image=self.ShowEye, command=self.toggle_pswrd, font=self.LblFont)
+        self.ShowHidePass.place(x=500, y=75)
+
         self.UserData = StringVar()
         self.UserData.set("Please Login To Enter The Game")
         self.UserDataLbl = Label(self, textvariable=self.UserData, font=self.LblFont, background="yellow")
@@ -84,6 +93,18 @@ class MainWindow(tkinter.Tk):  # create a window
         except:
             print("fail :(")
             showerror("ERROR", 'Failed logging in')
+
+    def toggle_pswrd(self):
+        try:
+            if self.EntPass.cget('show') == '':
+                self.EntPass.config(show='*')
+                self.ShowHidePass.config(image=self.ShowEye)
+            else:
+                self.EntPass.config(show='')
+                self.ShowHidePass.config(image=self.HideEye)
+        except:
+            print("failed to show/hide")
+            return False
 
     def handle_thread_socket(self):
         client_handler = threading.Thread(target=self.create_socket, args=())
