@@ -13,15 +13,16 @@ class Menu(tkinter.Toplevel):
         self.geometry("1200x720")
         self.title('Main Menu')
         self.format = 'utf-8'
-
-        self.img = Image.open('../Photos/Anya.jpg')
-        self.resizable(width=False, height=False)
-        self.resize = self.img.resize((1200, 720), Image.Resampling.LANCZOS)
-        self.bg = ImageTk.PhotoImage(self.resize)
-        self.imgLabel = Label(self, image=self.bg)
-        self.imgLabel.pack(expand=YES)
-        self.LblFont = font.Font(family='Comic Sans MS', weight="bold")
+        self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=10)
         self.Username = self.parent.UserData.get()
+        # self.img = Image.open('../Photos/Anya.jpg')
+        # self.resizable(width=False, height=False)
+        # self.resize = self.img.resize((1200, 720), Image.Resampling.LANCZOS)
+        # self.bg = ImageTk.PhotoImage(self.resize)
+        # self.imgLabel = Label(self, image=self.bg)
+        # self.imgLabel.pack(expand=YES)
+
+
         # wins_msg = ["GetWins", self.Username]
         # self.parent.send_msg(wins_msg, self.parent.client_socket)
         # self.UserWins = self.parent.recv_msg(self.parent.client_socket)
@@ -30,10 +31,10 @@ class Menu(tkinter.Toplevel):
     def create_gui(self):
         print(self.Username)
         self.WelMsg = "Welcome back, " + str(self.Username)
-        self.WelMsgLbl = Label(self, text=self.WelMsg, font=self.LblFont, background="yellow")
-        self.WelMsgLbl.place(x=600, y=250)
+        self.WelMsgLbl = Label(self, text=self.WelMsg, font=self.LblFont, bg='#D3D3D3')
+        self.WelMsgLbl.place(x=400, y=250)
 
-        self.WelMsgLbl = Label(self, text=self.WelMsg, font=self.LblFont, background="yellow")
+        self.WelMsgLbl = Label(self, text=self.WelMsg, font=self.LblFont, bg='#D3D3D3')
         self.WelMsgLbl.place(x=600, y=250)
 
 
