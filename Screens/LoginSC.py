@@ -15,7 +15,7 @@ class MainWindow(tkinter.Tk):  # create a window
     def __init__(self):
         super().__init__()
         self.title('Snakes and Ladders')
-        self.geometry("1200x720")
+        self.geometry("650x650")
         self.resizable(width=False, height=False)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold")
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -24,8 +24,8 @@ class MainWindow(tkinter.Tk):  # create a window
 
         self.icon = PhotoImage(file="../Photos/SAL_icon.png")
         self.iconphoto(False, self.icon)
-        self.img = Image.open('../Photos/anya.jpg')
-        self.resize = self.img.resize((1200, 720), Image.Resampling.LANCZOS)
+        self.img = Image.open('../Photos/loginBG.png')
+        self.resize = self.img.resize((650, 650), Image.Resampling.LANCZOS)
         self.bg = ImageTk.PhotoImage(self.resize)
         self.imgLabel = Label(self, image=self.bg)
         self.imgLabel.pack(expand=YES)
@@ -39,29 +39,32 @@ class MainWindow(tkinter.Tk):  # create a window
         self.Password = StringVar()
         self.PasswordLbl = Label(self, text="Password: ", width=10, font=self.LblFont)  # place a label on the window
         self.PasswordLbl.place(x=100, y=75)
-        self.EntPass = Entry(self, show='*', textvariable=self.Password, font=self.LblFont)
+        self.EntPass = Entry(self, show='●', textvariable=self.Password, font=self.LblFont)
         self.EntPass.place(x=225, y=75)
 
         self.ShowIcon = Image.open('../photos/Show.png')
-        self.ShowIconResize = self.ShowIcon.resize((35, 35), Image.Resampling.LANCZOS)
+        self.ShowIconResize = self.ShowIcon.resize((22, 22), Image.Resampling.LANCZOS)
         self.ShowEye = ImageTk.PhotoImage(self.ShowIconResize)
         self.HideIcon = Image.open('../photos/Hide.png')
-        self.HideIconResize = self.HideIcon.resize((35, 35), Image.Resampling.LANCZOS)
+        self.HideIconResize = self.HideIcon.resize((22, 22), Image.Resampling.LANCZOS)
         self.HideEye = ImageTk.PhotoImage(self.HideIconResize)
         self.ShowHidePass = Button(self, image=self.ShowEye, command=self.toggle_pswrd, font=self.LblFont)
-        self.ShowHidePass.place(x=500, y=75)
+        self.ShowHidePass.place(x=435, y=75)
 
         self.UserData = StringVar()
         self.UserData.set("Please Login To Enter The Game")
         self.UserDataLbl = Label(self, textvariable=self.UserData, font=self.LblFont, background="yellow")
         self.UserDataLbl.place(x=100, y=125)
 
-        self.btn_submit = Button(self, text="Login", command=self.login, background="lime", font=self.LblFont)
-        self.btn_submit.place(x=100, y=325)
-        self.btn_clear = Button(self, text="Clear", command=self.clear, background="red", font=self.LblFont)
-        self.btn_clear.place(x=200, y=325)
-        self.btn_register = Button(self, text='Register', command=self.open_register, background="cyan", font=self.LblFont)  # place a button on the window
-        self.btn_register.place(x=300, y=325)
+        self.NoAcc = Label(self, text="Don't have an account? Sign Up!", font=self.LblFont, fg="light blue", bg="red")
+        self.NoAcc.place(x=100, y=275)
+
+        self.btn_submit = Button(self, text="Login", command=self.login, width=10, background="lime", font=self.LblFont)
+        self.btn_submit.place(x=100, y=175)
+        self.btn_clear = Button(self, text="Clear", command=self.clear, width=10, background="red", font=self.LblFont)
+        self.btn_clear.place(x=220, y=175)
+        self.btn_register = Button(self, text='Sign Up', command=self.open_register, width=10, background="cyan", font=self.LblFont)
+        self.btn_register.place(x=170, y=325)
 
     def clear(self):
         self.EntEmail.delete(0, END)
@@ -85,9 +88,12 @@ class MainWindow(tkinter.Tk):  # create a window
             print(str_insert)
             self.send_msg(str_insert, self.client_socket)
             data = self.recv_msg(self.client_socket)
-            if data[0] == "L":
+            if data != "False":
+                self.UserData.set(str(data))
                 self.open_menu()
-            self.UserData.set(data)
+            else:
+                err_msg = "Failed to log in, please register if you don't have an account"
+                self.UserData.set(err_msg)
             print(data)
             return data
         except:
@@ -97,7 +103,7 @@ class MainWindow(tkinter.Tk):  # create a window
     def toggle_pswrd(self):
         try:
             if self.EntPass.cget('show') == '':
-                self.EntPass.config(show='*')
+                self.EntPass.config(show='●')
                 self.ShowHidePass.config(image=self.ShowEye)
             else:
                 self.EntPass.config(show='')

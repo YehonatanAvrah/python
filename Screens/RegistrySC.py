@@ -17,7 +17,7 @@ class Register(tkinter.Toplevel):
         self.format = 'utf-8'
 
         self.img = Image.open('../Photos/Anya2.jpg')
-        # self.resizable(width=False, height=False)
+        self.resizable(width=False, height=False)
         self.resize = self.img.resize((1200, 720), Image.Resampling.LANCZOS)
         self.bg = ImageTk.PhotoImage(self.resize)
         self.imgLabel = Label(self, image=self.bg)

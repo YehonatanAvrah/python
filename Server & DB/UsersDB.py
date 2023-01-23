@@ -59,7 +59,7 @@ class Users:
             print("User data: " + str(user_data))
             conn.commit()
             conn.close()
-            return row[2]
+            return row[4]
         except:
             print("Failed to find user")
             return False
@@ -111,11 +111,11 @@ class Users:
         except:
             return False
 
-    def get_all_wins(self, email):
+    def get_all_wins(self, cur_username):
         try:
             conn = sqlite3.connect('Users.db')
             print("Opened database successfully")  # check if worked
-            str1 = f"select*from {self.__tablename} where {self.__email} = '{email}'"
+            str1 = f"select*from {self.__tablename} where {self.__username} = '{cur_username}'"
             print(str1)
             cursor = conn.execute(str1)
             print(cursor)
@@ -124,7 +124,7 @@ class Users:
             print("User wins: " + user_wins)
             conn.commit()
             conn.close()
-            return "User wins: " + user_wins
+            return user_wins
         except:
             return False
 

@@ -14,19 +14,29 @@ class Menu(tkinter.Toplevel):
         self.title('Main Menu')
         self.format = 'utf-8'
 
-        self.img = Image.open('../Photos/Anya2.jpg')
-        # self.resizable(width=False, height=False)
+        self.img = Image.open('../Photos/Anya.jpg')
+        self.resizable(width=False, height=False)
         self.resize = self.img.resize((1200, 720), Image.Resampling.LANCZOS)
         self.bg = ImageTk.PhotoImage(self.resize)
         self.imgLabel = Label(self, image=self.bg)
         self.imgLabel.pack(expand=YES)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold")
-
+        self.Username = self.parent.UserData.get()
+        # wins_msg = ["GetWins", self.Username]
+        # self.parent.send_msg(wins_msg, self.parent.client_socket)
+        # self.UserWins = self.parent.recv_msg(self.parent.client_socket)
         self.create_gui()
 
     def create_gui(self):
-        self.btn_close = Button(self, text="Close", command=self.close, background="yellow", font=self.LblFont)
-        self.btn_close.place(x=200, y=275)
+        print(self.Username)
+        self.WelMsg = "Welcome back, " + str(self.Username)
+        self.WelMsgLbl = Label(self, text=self.WelMsg, font=self.LblFont, background="yellow")
+        self.WelMsgLbl.place(x=600, y=250)
+
+        self.WelMsgLbl = Label(self, text=self.WelMsg, font=self.LblFont, background="yellow")
+        self.WelMsgLbl.place(x=600, y=250)
+
+
 
     def close(self):
         self.parent.deiconify()  # show parent
