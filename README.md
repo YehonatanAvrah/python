@@ -1,2 +1,3 @@
-# python project :) 
-SAL - Snakes And Ladders
+# Snakes And Ladders
+Bagrut project in Cyber
+Yehonatan Avrahamian
