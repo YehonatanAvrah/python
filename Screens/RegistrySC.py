@@ -65,7 +65,7 @@ class Register(tkinter.Toplevel):
         self.button_reg = Button(self, text="Register", command=self.handle_add_user, font=self.LblFont, background="green")
         self.button_reg.place(x=100, y=275)
 
-        self.btn_close = Button(self, text="Close", command=self.close, background="yellow", font=self.LblFont)
+        self.btn_close = Button(self, text="Close", command=self.close, background="red", font=self.LblFont)
         self.btn_close.place(x=200, y=275)
 
     def handle_add_user(self):
