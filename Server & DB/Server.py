@@ -92,6 +92,8 @@ class Server:
                     print(arr)
                     server_data = self.userDb.insert_user(arr[1], arr[2], arr[3], arr[4], arr[5])
                     print("server data:", server_data)
+                    if server_data == "Email exists":
+                        self.send_msg("Email already exists", client_socket)
                     if server_data:
                         self.send_msg("Successfully registered!", client_socket)
                     elif not server_data:

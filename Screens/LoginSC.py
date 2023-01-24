@@ -15,9 +15,12 @@ class MainWindow(tkinter.Tk):  # create a window
     def __init__(self):
         super().__init__()
         self.title('Snakes and Ladders')
-        self.geometry("950x500")
-        self.configure(bg='#D3D3D3')
+        self.geometry("1000x500")
+        self.canvas = Canvas(width=1000, height=500, bg='#AC94F4')
+        self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
+        # self.Frame = Frame(self, bg='#80c1ff')
+        # self.Frame.place(relx=0.5, rely=0.1, relwidth=0.75, relheight=0.1, anchor='n')
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.handle_thread_socket()
@@ -26,19 +29,19 @@ class MainWindow(tkinter.Tk):  # create a window
         # ====================Logo and Icon======================
         self.icon = PhotoImage(file="../Photos/SAL_icon.png")
         self.iconphoto(False, self.icon)
-        # self.logo = Image.open('../Photos/SAL_Logo.jpg')
-        # self.Lphoto = ImageTk.PhotoImage(self.logo)
-        # self.logo_lbl = Label(self, image=self.Lphoto)
-        # self.logo_lbl.place(x=300, y=75)
+        self.logo_photo = Image.open('../Photos/SAL_Logo.png')
+        self.logo = ImageTk.PhotoImage(self.logo_photo)
+        self.canvas.create_image(350, 75, image=self.logo, anchor=NW)
 
         # self.img = Image.open('../Photos/Anya.jpg')
         # self.resize = self.img.resize((650, 650), Image.Resampling.LANCZOS)
         # self.bg = ImageTk.PhotoImage(self.resize)
         # self.imgLabel = Label(self, image=self.bg)
         # self.imgLabel.pack(expand=YES)
-        # ====================Labels, Entries, Buttons======================
+
+        # ====================Labels & Entries======================
         self.Email = StringVar()
-        # self.EmailLbl = Label(self, text="Email: ", width=10, font=self.LblFont, bg='#D3D3D3')  # place a label on the window
+        # self.EmailLbl = Label(self, text="Email: ", width=10, font=self.LblFont, bg='#AC94F4')  # place a label on the window
         # self.EmailLbl.place(x=100, y=25)
         self.EntEmail = Entry(self, textvariable=self.Email, border=0, font=self.LblFont)
         self.EntEmail.place(x=100, y=25)  # x=225, y=25
@@ -47,28 +50,29 @@ class MainWindow(tkinter.Tk):  # create a window
         self.EntEmail.bind('<FocusOut>', self.email_leave)
 
         self.Password = StringVar()
-        self.PasswordLbl = Label(self, text="Password: ", width=10, font=self.LblFont, bg='#D3D3D3')
+        self.PasswordLbl = Label(self, text="Password: ", width=10, font=self.LblFont, bg='#AC94F4')
         self.PasswordLbl.place(x=100, y=75)
         self.EntPass = Entry(self, show='●', textvariable=self.Password, font=self.LblFont)
         self.EntPass.place(x=210, y=75)
 
         self.ShowIcon = Image.open('../photos/Show.png')
-        self.ShowIconResize = self.ShowIcon.resize((27, 27), Image.Resampling.LANCZOS)
+        self.ShowIconResize = self.ShowIcon.resize((27, 28), Image.Resampling.LANCZOS)
         self.ShowEye = ImageTk.PhotoImage(self.ShowIconResize)
         self.HideIcon = Image.open('../photos/Hide.png')
-        self.HideIconResize = self.HideIcon.resize((27, 27), Image.Resampling.LANCZOS)
+        self.HideIconResize = self.HideIcon.resize((27, 28), Image.Resampling.LANCZOS)
         self.HideEye = ImageTk.PhotoImage(self.HideIconResize)
         self.ShowHidePass = Button(self, image=self.ShowEye, command=self.toggle_pswrd, font=self.LblFont)
-        self.ShowHidePass.place(x=480, y=75)
+        self.ShowHidePass.place(x=460, y=75)
 
         self.UserData = StringVar()
         self.UserData.set("Please Login To Enter The Game")
-        self.UserDataLbl = Label(self, textvariable=self.UserData, font=self.LblFont, bg='#D3D3D3', fg="red")
+        self.UserDataLbl = Label(self, textvariable=self.UserData, font=self.LblFont, bg='#AC94F4', fg="red")
         self.UserDataLbl.place(x=100, y=125)
 
-        self.NoAcc = Label(self, text="Don't have an account? Sign Up!", font=self.LblFont, fg="blue", bg="#D3D3D3")
+        self.NoAcc = Label(self, text="Don't have an account? Sign Up!", font=self.LblFont, fg="blue", bg='#AC94F4')
         self.NoAcc.place(x=100, y=275)
 
+        # ====================Buttons======================
         self.btn_submit = Button(self, text="Login", command=self.login, width=10, background="lime", font=self.LblFont)
         self.btn_submit.place(x=100, y=175)
         self.btn_clear = Button(self, text="Clear", command=self.clear, width=10, background="red", font=self.LblFont)

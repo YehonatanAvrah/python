@@ -11,9 +11,10 @@ class Menu(tkinter.Toplevel):
         self.client_handler = None
         self.parent = parent
         self.geometry("1200x720")
+        self.configure(bg='#D3D3D3')
         self.title('Main Menu')
         self.format = 'utf-8'
-        self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=10)
+        self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
         self.Username = self.parent.UserData.get()
         # self.img = Image.open('../Photos/Anya.jpg')
         # self.resizable(width=False, height=False)
@@ -32,12 +33,10 @@ class Menu(tkinter.Toplevel):
         print(self.Username)
         self.WelMsg = "Welcome back, " + str(self.Username)
         self.WelMsgLbl = Label(self, text=self.WelMsg, font=self.LblFont, bg='#D3D3D3')
-        self.WelMsgLbl.place(x=400, y=250)
+        self.WelMsgLbl.place(x=500, y=250)
 
-        self.WelMsgLbl = Label(self, text=self.WelMsg, font=self.LblFont, bg='#D3D3D3')
-        self.WelMsgLbl.place(x=600, y=250)
-
-
+        self.btn_close = Button(self, text="Close", command=self.close, background="red", font=self.LblFont)
+        self.btn_close.place(x=200, y=275)
 
     def close(self):
         self.parent.deiconify()  # show parent
