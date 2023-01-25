@@ -98,8 +98,8 @@ class MainWindow(tkinter.Tk):  # create a window
         window.grab_set()
         self.withdraw()
 
-    def open_menu(self):
-        window = Menu(self)
+    def open_menu(self, username):
+        window = Menu(self, username)
         window.grab_set()
         self.withdraw()
 
@@ -111,9 +111,9 @@ class MainWindow(tkinter.Tk):  # create a window
             print(str_insert)
             self.send_msg(str_insert, self.client_socket)
             data = self.recv_msg(self.client_socket)
-            if data != "False":
-                self.UserData.set(str(data))
-                self.open_menu()
+            if data != "Err_NotExist" and data is not None:
+                self.UserData.set("Logged in successfully, Welcome back")
+                self.open_menu(data)
             else:
                 err_msg = "Failed to log in, please register if you don't have an account"
                 self.UserData.set(err_msg)
@@ -142,7 +142,8 @@ class MainWindow(tkinter.Tk):  # create a window
 
     def create_socket(self):
         self.client_socket.connect(('127.0.0.1', 1956))
-        data = self.client_socket.recv(1024).decode()
+        data = self.recv_msg(self.client_socket)
+        # data = self.client_socket.recv(1024).decode()
         print("Data is " + data)
         print("Hello ", self.client_socket)
 

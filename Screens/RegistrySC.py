@@ -36,7 +36,7 @@ class Register(tkinter.Toplevel):
         self.Password = StringVar()
         self.PasswordLbl = Label(self, text="Password: ", width=10, font=self.LblFont)  # place a label on the window
         self.PasswordLbl.place(x=100, y=75)
-        self.EntPass = Entry(self, show='*', textvariable=self.Password, font=self.LblFont)
+        self.EntPass = Entry(self, show='●', textvariable=self.Password, font=self.LblFont)
         self.EntPass.place(x=225, y=75)
 
         self.FName = StringVar()

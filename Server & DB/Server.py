@@ -87,7 +87,7 @@ class Server:
                 print(server_data)
                 print(arr)
                 cmd = arr[0]
-                if arr and cmd == "register" and len(arr) == 6 and arr[4] != "False":
+                if arr and cmd == "register" and len(arr) == 6 and arr[4] != "Err_NotExist":
                     print("Register")
                     print(arr)
                     server_data = self.userDb.insert_user(arr[1], arr[2], arr[3], arr[4], arr[5])
@@ -112,7 +112,7 @@ class Server:
                         print("EROR>>> Failed to login")
                         # err_msg = "Failed to log in, please register if you don't have an account"
                         # print(err_msg)
-                        self.send_msg("False", client_socket)
+                        self.send_msg("Err_NotExist", client_socket)
 
                 elif arr and cmd == "exit" and len(arr) == 1:
                     print("exit")

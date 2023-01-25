@@ -6,7 +6,7 @@ from PIL import ImageTk, Image
 
 
 class Menu(tkinter.Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, username):
         super().__init__(parent)
         self.client_handler = None
         self.parent = parent
@@ -15,7 +15,7 @@ class Menu(tkinter.Toplevel):
         self.title('Main Menu')
         self.format = 'utf-8'
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
-        self.Username = self.parent.UserData.get()
+        self.Username = username # self.parent.UserData.get()
         # self.img = Image.open('../Photos/Anya.jpg')
         # self.resizable(width=False, height=False)
         # self.resize = self.img.resize((1200, 720), Image.Resampling.LANCZOS)
