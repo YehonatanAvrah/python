@@ -16,6 +16,9 @@ class Register(tkinter.Toplevel):
         self.title('Registration')
         self.format = 'utf-8'
 
+        # ====================BG and Icon======================
+        self.icon = PhotoImage(file="../Photos/SAL_icon.png")
+        self.iconphoto(False, self.icon)
         self.img = Image.open('../Photos/Anya2.jpg')
         self.resizable(width=False, height=False)
         self.resize = self.img.resize((1200, 720), Image.Resampling.LANCZOS)
@@ -27,6 +30,7 @@ class Register(tkinter.Toplevel):
         self.create_gui()
 
     def create_gui(self):
+        # ====================Labels & Entries======================
         self.Email = StringVar()
         self.EmailLbl = Label(self, text="Email: ", width=10, font=self.LblFont)  # place a label on the window
         self.EmailLbl.place(x=100, y=25)
@@ -62,6 +66,7 @@ class Register(tkinter.Toplevel):
         self.SucRegLbl = Label(self, textvariable=self.SucReg, font=self.LblFont, background="yellow")
         self.SucRegLbl.place(x=100, y=325)
 
+        # ====================Buttons======================
         self.button_reg = Button(self, text="Register", command=self.handle_add_user, font=self.LblFont, background="green")
         self.button_reg.place(x=100, y=275)
 

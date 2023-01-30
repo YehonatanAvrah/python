@@ -31,7 +31,7 @@ class Server:
                 print("New client connected")
                 self.send_msg("Connection with server successfully established", client_socket)
                 self.count += 1
-                print(self.count)
+                print("current amount of clients:" + self.count)
 
         except socket.error as e:
             print(e)
@@ -129,6 +129,7 @@ class Server:
             except socket.error as e:
                 print(e)
                 running = False
+                self.count -= 1
                 break
         client_socket.close()
 
