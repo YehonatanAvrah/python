@@ -114,6 +114,9 @@ class Server:
                         # print(err_msg)
                         self.send_msg("Err_NotExist", client_socket)
 
+                elif arr and cmd == "lobby" and len(arr) == 2:
+                    print("enter lobby" + arr)
+
                 elif arr and cmd == "exit" and len(arr) == 1:
                     print("exit")
                     running = False  # change the variable to exit the loop
