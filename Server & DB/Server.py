@@ -1,6 +1,7 @@
 import socket
 import threading
 from UsersDB import *
+from Player import  *
 
 SIZE = 8
 
@@ -15,6 +16,7 @@ class Server:
         self.format = 'utf-8'
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Create a socket
         self.userDb = Users()
+        self.players = []
 
     def start_server(self):
         try:
@@ -31,7 +33,7 @@ class Server:
                 print("New client connected")
                 self.send_msg("Connection with server successfully established", client_socket)
                 self.count += 1
-                print("current amount of clients:" + self.count)
+                print(f"current amount of clients: {self.count}")
 
         except socket.error as e:
             print(e)
@@ -135,6 +137,28 @@ class Server:
                 self.count -= 1
                 break
         client_socket.close()
+
+    def create_Lobby(self, client_socket, arr):
+        player = Player(client_socket, arr[1])
+        self.players.append(player)
+        if len(self.players) == 1:
+            data = [arr[1], "Wait"]
+            join_data = ",".join(data)
+            self.send_msg(join_data, client_socket)
+            #client_socket.send(join_data.encode())
+        elif len(self.players) == 2:
+            player1 = self.players[0]
+            player2 = self.players[1]
+            socket1 = player1.client_socket
+            socket2 = player2.client_socket
+            data1 = [player1.name, "Start"]
+            data2 = [player2.name, "Start"]
+            str_data1 = ",".join(data1)
+            str_data2 = ",".join(data2)
+            self.send_msg(str_data2, client_socket)
+            self.send_msg(str_data1, client_socket)
+            #socket1.send(str_data2.encode())
+            #socket2.send(str_data1.encode())
 
 
 if __name__ == '__main__':
