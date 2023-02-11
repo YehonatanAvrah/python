@@ -3,6 +3,7 @@ import tkinter
 from tkinter import *
 import tkinter.font as font
 from PIL import ImageTk, Image
+from LobbySC import Lobby
 
 
 class Menu(tkinter.Toplevel):
@@ -60,7 +61,9 @@ class Menu(tkinter.Toplevel):
         pass
 
     def open_lobby(self):
-        pass
+        window = Lobby(self)
+        window.grab_set()
+        self.withdraw()
 
     # def close(self):
     #     self.parent.deiconify()  # show parent

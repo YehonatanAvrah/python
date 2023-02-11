@@ -89,6 +89,7 @@ class Server:
                 print(server_data)
                 print(arr)
                 cmd = arr[0]
+
                 if arr and cmd == "register" and len(arr) == 6 and arr[4] != "Err_NotExist":
                     print("Register")
                     print(arr)
@@ -104,7 +105,7 @@ class Server:
                 elif arr and cmd == "login" and len(arr) == 3:
                     print("login")
                     print(arr)
-                    server_data = self.userDb.ret_user_by_email_and_pswrd(arr[1], arr[2])
+                    server_data = self.userDb.ret_user_by_email_and_pswrd(arr[1], arr[2])  # arr[1, 2] = email, password
                     print("server data:", server_data)
                     if server_data:
                         # msg = "Logged in successfully, Welcome back " + str(server_data)
@@ -116,8 +117,9 @@ class Server:
                         # print(err_msg)
                         self.send_msg("Err_NotExist", client_socket)
 
-                elif arr and cmd == "lobby" and len(arr) == 2:
-                    print("enter lobby" + arr)
+                elif arr and cmd == "waiting_room" and len(arr) == 2:
+                    print("enter lobby " + arr[1])
+                    self.handle_lobby(client_socket, arr[1])  # arr[1] = username
 
                 elif arr and cmd == "exit" and len(arr) == 1:
                     print("exit")
@@ -138,11 +140,11 @@ class Server:
                 break
         client_socket.close()
 
-    def create_Lobby(self, client_socket, arr):
-        player = Player(client_socket, arr[1])
+    def handle_lobby(self, client_socket, username):
+        player = Player(client_socket, username)
         self.players.append(player)
         if len(self.players) == 1:
-            data = [arr[1], "Wait"]
+            data = ["Wait", username]
             join_data = ",".join(data)
             self.send_msg(join_data, client_socket)
             #client_socket.send(join_data.encode())
@@ -151,12 +153,12 @@ class Server:
             player2 = self.players[1]
             socket1 = player1.client_socket
             socket2 = player2.client_socket
-            data1 = [player1.name, "Start"]
-            data2 = [player2.name, "Start"]
+            data1 = ["Start", player1.name]
+            data2 = ["Start", player2.name]
             str_data1 = ",".join(data1)
             str_data2 = ",".join(data2)
-            self.send_msg(str_data2, client_socket)
-            self.send_msg(str_data1, client_socket)
+            self.send_msg(str_data2, socket1)
+            self.send_msg(str_data1, socket2)
             #socket1.send(str_data2.encode())
             #socket2.send(str_data1.encode())
 
