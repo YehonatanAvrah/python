@@ -35,6 +35,7 @@ class Lobby(tkinter.Toplevel):
         self.timer = StringVar()
         self.timer.set("5")
         self.TimerLbl = Label(self.canvas, textvariable=self.timer)
+        self.TimerLbl.place(x=25, y=20)
         self.player_list = Listbox(self)
         self.player_list.place(x=25, y=40)
         self.handle_wait_for_player()
