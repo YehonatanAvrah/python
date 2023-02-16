@@ -54,16 +54,17 @@ class Lobby(tkinter.Toplevel):
             print(str_insert)
             self.parent.parent.send_msg(str_insert, self.parent.parent.client_socket)
             data = self.parent.parent.recv_msg(self.parent.parent.client_socket)
+            print(data)
             if data is not None:
                 arr_data = data.split(",")
                 if arr_data[0] == "Wait":  # one player in lobby
                     print("one player")
                     data = self.parent.parent.recv_msg(self.parent.parent.client_socket)
-                    arr_data = data.split(",")
-                    self.player_list.insert(2, arr_data[1])
+                    arr_data2 = data.split(",")
+                    self.player_list.insert(2, arr_data2[1])
                 elif arr_data[0] == "Start":  # full party
                     print("two players")
-                    self.player_list.insert(END, arr_data[1])
+                    self.player_list.insert(2, arr_data[1])
                     self.countdown()
         except:
             print("fail- lobby")
