@@ -32,11 +32,12 @@ class Lobby(tkinter.Toplevel):
     def create_gui(self):
         # ====================Labels======================
         self.canvas.create_text(85, 20, text="Party Members", fill="black", font=self.LblFont)
-        self.timer = StringVar()
-        self.timer.set("5")
-        self.TimerLbl = Label(self.canvas, textvariable=self.timer)
-        self.TimerLbl.place(x=25, y=20)
-        self.player_list = Listbox(self)
+        self.wait = self.canvas.create_text(300, 450, text="Waiting For Players...", fill="Lime", font=self.LblFont)
+        self.timer = 5
+        #self.timer.set("5")
+        self.TimerLbl = Label(self.canvas, text=self.timer)
+        self.TimerLbl.place(x=630, y=15)
+        self.player_list = Listbox(self, font=self.LblFont, )
         self.player_list.place(x=25, y=40)
         self.handle_wait_for_player()
 
@@ -57,10 +58,12 @@ class Lobby(tkinter.Toplevel):
                 arr_data = data.split(",")
                 if arr_data[0] == "Wait":  # one player in lobby
                     print("one player")
-                    self.player_list.insert(1, arr_data[1])
-                elif arr_data[0] == "Start":  # full party
-                    print("two player")
+                    data = self.parent.parent.recv_msg(self.parent.parent.client_socket)
+                    arr_data = data.split(",")
                     self.player_list.insert(2, arr_data[1])
+                elif arr_data[0] == "Start":  # full party
+                    print("two players")
+                    self.player_list.insert(END, arr_data[1])
                     self.countdown()
         except:
             print("fail- lobby")
@@ -71,10 +74,14 @@ class Lobby(tkinter.Toplevel):
         self.withdraw()
 
     def countdown(self):
-        if str(self.timer) >= "0":
+        # self.timer = 5  # int(self.timer)
+        # print(type(self.timer))
+        self.canvas.itemconfig(self.wait, text="Full Party, Starting Queue...")  # (self.wait, state='hidden')
+        if self.timer >= 0:
             # self.UserData.set("Logged in successfully, Welcome back")
-            self.TimerLbl.config(str(self.timer))
-            self.TimerLbl.after(1000, self.countdown, int(str(self.timer)) - 1)
+            self.TimerLbl.configure(text="%d" % self.timer)
+            self.timer -= 1
+            self.TimerLbl.after(1000, self.countdown)
         else:
             self.open_game()
 
@@ -86,7 +93,6 @@ class Lobby(tkinter.Toplevel):
         counter = 5
         TimerLbl = StringVar()
         TimerLbl.set(f"Waiting in queue {counter}")
-
-        self.open_game(players_str)
+        self.open_game()
 
 

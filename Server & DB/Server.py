@@ -1,7 +1,7 @@
 import socket
 import threading
 from UsersDB import *
-from Player import  *
+from Player import *
 
 SIZE = 8
 
@@ -119,7 +119,7 @@ class Server:
 
                 elif arr and cmd == "waiting_room" and len(arr) == 2:
                     print("enter lobby " + arr[1])
-                    self.handle_lobby(client_socket, arr[1])  # arr[1] = username
+                    self.handle_lobby(arr[1], client_socket)  # arr[1] = username
 
                 elif arr and cmd == "exit" and len(arr) == 1:
                     print("exit")
@@ -140,15 +140,18 @@ class Server:
                 break
         client_socket.close()
 
-    def handle_lobby(self, client_socket, username):
+    def handle_lobby(self, username, client_socket):
+        print("handle lobby")
         player = Player(client_socket, username)
         self.players.append(player)
         if len(self.players) == 1:
+            print("1 player")
             data = ["Wait", username]
             join_data = ",".join(data)
             self.send_msg(join_data, client_socket)
             #client_socket.send(join_data.encode())
         elif len(self.players) == 2:
+            print("2 players")
             player1 = self.players[0]
             player2 = self.players[1]
             socket1 = player1.client_socket
@@ -157,6 +160,7 @@ class Server:
             data2 = ["Start", player2.name]
             str_data1 = ",".join(data1)
             str_data2 = ",".join(data2)
+            print("Sending data")
             self.send_msg(str_data2, socket1)
             self.send_msg(str_data1, socket2)
             #socket1.send(str_data2.encode())
