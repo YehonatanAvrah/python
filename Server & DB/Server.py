@@ -100,7 +100,7 @@ class Server:
                     if server_data:
                         self.send_msg("Successfully registered!", client_socket)
                     elif not server_data:
-                        self.send_msg("EROR>>> Failed to register user", client_socket)
+                        self.send_msg("ERROR>>> Failed to register user", client_socket)
 
                 elif arr and cmd == "login" and len(arr) == 3:
                     print("login")
@@ -112,7 +112,7 @@ class Server:
                         # print(msg)
                         self.send_msg(server_data, client_socket)
                     elif not server_data:
-                        print("EROR>>> Failed to login")
+                        print("ERROR>>> Failed to login")
                         # err_msg = "Failed to log in, please register if you don't have an account"
                         # print(err_msg)
                         self.send_msg("Err_NotExist", client_socket)
