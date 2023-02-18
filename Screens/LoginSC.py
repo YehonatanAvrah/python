@@ -73,10 +73,10 @@ class MainWindow(tkinter.Tk):  # create a window
         self.NoAcc.place(x=100, y=275)
 
         # ====================Buttons======================
-        self.btn_submit = Button(self, text="Login", command=self.login, width=10, background="lime", font=self.LblFont)
+        self.btn_submit = Button(self, text="Sign In", command=self.login, width=10, background="lime", font=self.LblFont)
         self.btn_submit.place(x=100, y=175)
-        self.btn_clear = Button(self, text="Clear", command=self.clear, width=10, background="red", font=self.LblFont)
-        self.btn_clear.place(x=250, y=175)
+        # self.btn_clear = Button(self, text="Clear", command=self.clear, width=10, background="red", font=self.LblFont)
+        # self.btn_clear.place(x=250, y=175)
         self.btn_register = Button(self, text='Sign Up', command=self.open_register, width=10, background="cyan",
                                    font=self.LblFont)
         self.btn_register.place(x=170, y=325)
@@ -111,8 +111,9 @@ class MainWindow(tkinter.Tk):  # create a window
             print(str_insert)
             self.send_msg(str_insert, self.client_socket)
             data = self.recv_msg(self.client_socket)
-            if data != "Err_NotExist" and data is not None:
+            if data is not None and data != "Err_NotExist":
                 self.UserData.set("Logged in successfully, Welcome back")
+                self.EntPass.delete(0, END)
                 self.open_menu(data)
             else:
                 err_msg = "Failed to log in, please register if you don't have an account"

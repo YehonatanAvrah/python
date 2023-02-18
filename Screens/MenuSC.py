@@ -3,17 +3,18 @@ import tkinter
 from tkinter import *
 import tkinter.font as font
 from PIL import ImageTk, Image
+from LobbySC import Lobby
 
 
 class Menu(tkinter.Toplevel):
-    def __init__(self, username):
-        super().__init__()
+    def __init__(self, parent, username):
+        super().__init__(parent)
         self.client_handler = None
-        #self.parent = parent
+        self.parent = parent
         self.geometry("750x600")
         self.title('Main Menu')
         self.format = 'utf-8'
-        self.canvas = Canvas(width=750, height=600, bg='#AC94F4')
+        self.canvas = Canvas(self, width=750, height=600, bg='#AC94F4')
         self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
@@ -42,12 +43,12 @@ class Menu(tkinter.Toplevel):
         self.canvas.create_text(80, 82, text=self.Username, fill="black", font=self.LblFont)
 
         # ====================Buttons======================
-        self.btn_settings = Button(self, text="Settings", command=self.open_settings, background="Gray", font=self.LblFont)
+        self.btn_settings = Button(self.canvas, text="Settings", command=self.open_settings, background="Gray", font=self.LblFont)
         self.btn_settings.place(x=625, y=20)
-        self.btn_history = Button(self, text="Game History", command=self.open_history, background="#ff8b3d",
+        self.btn_history = Button(self.canvas, text="Game History", command=self.open_history, background="#ff8b3d",
                                   font=self.LblFont)
         self.btn_history.place(x=125, y=420)
-        self.btn_game = Button(self, text="Ready", command=self.open_lobby, background="lime", font=self.LblFont)
+        self.btn_game = Button(self.canvas, text="Ready", command=self.open_lobby, background="lime", font=self.LblFont)
         self.btn_game.place(x=575, y=420)
 
         # self.btn_close = Button(self, text="Close", command=self.close, background="red", font=self.LblFont)
@@ -60,12 +61,14 @@ class Menu(tkinter.Toplevel):
         pass
 
     def open_lobby(self):
-        pass
+        window = Lobby(self)
+        window.grab_set()
+        self.withdraw()
 
     # def close(self):
     #     self.parent.deiconify()  # show parent
     #     self.destroy()  # close and destroy this screen
 
-M = Menu("Johnny")
-M.mainloop()
+# M = Menu("Johnny")
+# M.mainloop()
 

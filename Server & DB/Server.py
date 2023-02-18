@@ -1,6 +1,7 @@
 import socket
 import threading
 from UsersDB import *
+from Player import *
 
 SIZE = 8
 
@@ -15,6 +16,7 @@ class Server:
         self.format = 'utf-8'
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Create a socket
         self.userDb = Users()
+        self.players = []
 
     def start_server(self):
         try:
@@ -31,7 +33,7 @@ class Server:
                 print("New client connected")
                 self.send_msg("Connection with server successfully established", client_socket)
                 self.count += 1
-                print("current amount of clients:" + self.count)
+                print(f"current amount of clients: {self.count}")
 
         except socket.error as e:
             print(e)
@@ -87,6 +89,7 @@ class Server:
                 print(server_data)
                 print(arr)
                 cmd = arr[0]
+
                 if arr and cmd == "register" and len(arr) == 6 and arr[4] != "Err_NotExist":
                     print("Register")
                     print(arr)
@@ -97,22 +100,26 @@ class Server:
                     if server_data:
                         self.send_msg("Successfully registered!", client_socket)
                     elif not server_data:
-                        self.send_msg("EROR>>> Failed to register user", client_socket)
+                        self.send_msg("ERROR>>> Failed to register user", client_socket)
 
                 elif arr and cmd == "login" and len(arr) == 3:
                     print("login")
                     print(arr)
-                    server_data = self.userDb.ret_user_by_email_and_pswrd(arr[1], arr[2])
+                    server_data = self.userDb.ret_user_by_email_and_pswrd(arr[1], arr[2])  # arr[1, 2] = email, password
                     print("server data:", server_data)
                     if server_data:
                         # msg = "Logged in successfully, Welcome back " + str(server_data)
                         # print(msg)
                         self.send_msg(server_data, client_socket)
                     elif not server_data:
-                        print("EROR>>> Failed to login")
+                        print("ERROR>>> Failed to login")
                         # err_msg = "Failed to log in, please register if you don't have an account"
                         # print(err_msg)
                         self.send_msg("Err_NotExist", client_socket)
+
+                elif arr and cmd == "waiting_room" and len(arr) == 2:
+                    print("enter lobby " + arr[1])
+                    self.handle_lobby(arr[1], client_socket)  # arr[1] = username
 
                 elif arr and cmd == "exit" and len(arr) == 1:
                     print("exit")
@@ -132,6 +139,32 @@ class Server:
                 self.count -= 1
                 break
         client_socket.close()
+
+    def handle_lobby(self, username, client_socket):
+        print("handle lobby")
+        player = Player(client_socket, username)
+        self.players.append(player)
+        if len(self.players) == 1:
+            print("1 player")
+            data = ["Wait", username]
+            join_data = ",".join(data)
+            self.send_msg(join_data, client_socket)
+            #client_socket.send(join_data.encode())
+        elif len(self.players) == 2:
+            print("2 players")
+            player1 = self.players[0]
+            player2 = self.players[1]
+            socket1 = player1.client_socket
+            socket2 = player2.client_socket
+            data1 = ["Start", player1.name]
+            data2 = ["Start", player2.name]
+            str_data1 = ",".join(data1)
+            str_data2 = ",".join(data2)
+            print("Sending data")
+            self.send_msg(str_data2, socket1)
+            self.send_msg(str_data1, socket2)
+            #socket1.send(str_data2.encode())
+            #socket2.send(str_data1.encode())
 
 
 if __name__ == '__main__':
