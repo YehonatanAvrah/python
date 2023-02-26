@@ -17,11 +17,9 @@ class Game(tkinter.Toplevel):
         self.resizable(width=False, height=False)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
         self.Username = str(parent.Username)  # self.parent.UserData.get()
-        #self.create_gui()
+        self.create_gui()
 
-        # ====================Logo and Icon======================
-        self.icon = PhotoImage(file="../Photos/SAL_icon.png")
-        self.iconphoto(False, self.icon)
-        self.logo_photo = Image.open("../Photos/SAL_Logo.png")
-        self.logo = ImageTk.PhotoImage(self.logo_photo)
-        self.canvas.create_image(15, 120, image=self.logo, anchor=NW)
+    def create_gui(self):
+        pass
+
+
