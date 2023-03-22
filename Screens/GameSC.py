@@ -20,6 +20,9 @@ class Game(tkinter.Toplevel):
         self.create_gui()
 
     def create_gui(self):
-        pass
+        self.board = Image.open("../Photos/Game_Board.png")
+        self.board_resize = self.board.resize((1000, 800), Image.Resampling.LANCZOS)
+        self.game_board = ImageTk.PhotoImage(self.board_resize)
+        self.canvas.create_image(100, 20, image=self.game_board, anchor=NW)
 
 
