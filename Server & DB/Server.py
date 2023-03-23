@@ -81,6 +81,7 @@ class Server:
         print(running)
         while running:
             try:
+                print("---------------------------------")
                 server_data = self.recv_msg(client_socket)
                 if server_data is None:
                     break
