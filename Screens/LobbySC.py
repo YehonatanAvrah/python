@@ -37,7 +37,8 @@ class Lobby(tkinter.Toplevel):
         #self.timer.set("5")
         self.TimerLbl = Label(self.canvas, text=self.timer)
         self.TimerLbl.place(x=630, y=15)
-        self.player_list = Listbox(self, font=self.LblFont, )
+        self.player_list = Listbox(self, font=self.LblFont)
+        self.player_list.insert(1, self.Username)
         self.player_list.place(x=25, y=40)
         self.handle_wait_for_player()
 
@@ -62,6 +63,7 @@ class Lobby(tkinter.Toplevel):
                     data = self.parent.parent.recv_msg(self.parent.parent.client_socket)
                     arr_data2 = data.split(",")
                     self.player_list.insert(2, arr_data2[1])
+                    self.countdown()
                 elif arr_data[0] == "Start":  # full party
                     print("two players")
                     self.player_list.insert(2, arr_data[1])
