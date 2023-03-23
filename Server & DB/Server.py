@@ -145,6 +145,7 @@ class Server:
         print("handle lobby")
         player = Player(client_socket, username)
         self.players.append(player)
+        print(len(self.players))
         if len(self.players) == 1:
             print("1 player")
             data = ["Wait", username]
