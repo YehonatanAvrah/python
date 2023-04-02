@@ -22,7 +22,7 @@ class Game(tkinter.Toplevel):
     def create_gui(self):
         # --------Board--------
         self.board = Image.open("../Photos/Game_Board.png")
-        self.board_resize = self.board.resize((800, 600), Image.Resampling.LANCZOS)
+        self.board_resize = self.board.resize((1000, 800), Image.Resampling.LANCZOS)
         self.game_board = ImageTk.PhotoImage(self.board_resize)
         self.canvas.create_image(100, 20, image=self.game_board, anchor=NW)
         self.start = Image.open("../Photos/start_block.png")
@@ -39,11 +39,11 @@ class Game(tkinter.Toplevel):
 
         # --------pawns--------
         self.pawn1 = Image.open("../Photos/red_pawn.png")
-        self.pawn1_resize = self.pawn1.resize((100, 100), Image.Resampling.LANCZOS)
+        self.pawn1_resize = self.pawn1.resize((50, 50), Image.Resampling.LANCZOS)
         self.pawn_red = ImageTk.PhotoImage(self.pawn1_resize)
         self.canvas.create_image(50, 600, image=self.pawn_red, anchor=NW)
 
         self.pawn2 = Image.open("../Photos/blue_pawn.png")
-        self.pawn2_resize = self.pawn2.resize((100, 100), Image.Resampling.LANCZOS)
+        self.pawn2_resize = self.pawn2.resize((50, 50), Image.Resampling.LANCZOS)
         self.pawn_blue = ImageTk.PhotoImage(self.pawn2_resize)
-        self.canvas.create_image(60, 600, image=self.pawn_blue, anchor=NW)
+        self.canvas.create_image(20, 600, image=self.pawn_blue, anchor=NW)
