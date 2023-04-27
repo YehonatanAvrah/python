@@ -104,7 +104,9 @@ class Game(tkinter.Toplevel):
         # self.player_pos2 = self.player_pos2 + dice_result  # calculate the new position of the player2
         self.canvas.coords(self.player_1, self.square_index[self.player_pos1][0],
                            self.square_index[self.player_pos1][1])
-        self.after(100)
+        self.after(300, self.check_ladder_or_snake)
+
+    def check_ladder_or_snake(self):
         if self.player_pos1 in self.ladders.keys():
             top_of_ladder = self.ladders[self.player_pos1]
             self.canvas.coords(self.player_1, self.square_index[top_of_ladder][0],
@@ -115,7 +117,4 @@ class Game(tkinter.Toplevel):
             self.canvas.coords(self.player_1, self.square_index[bottom_of_snake][0],
                                self.square_index[bottom_of_snake][1])
             self.player_pos1 = bottom_of_snake
-        # else:
-        #     self.canvas.coords(self.player_1, self.square_index[self.player_pos1][0],
-        #                        self.square_index[self.player_pos1][1])
         # self.canvas.coords(self.player_2, self.square_index[self.player_pos2][0], self.square_index[self.player_pos2][1])
