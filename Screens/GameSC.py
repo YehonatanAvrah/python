@@ -71,6 +71,8 @@ class Game(tkinter.Toplevel):
         r = random.randint(1, 6)
         # print(r)
         self.btn_roll.config(image=self.arr_dice[r - 1])
+        self.after(300, self.move_pawn, r)
+
 
     def get_index(self):
         # X- difference of 100 btwn each square, Y- difference of 80 btwn each square
@@ -100,6 +102,9 @@ class Game(tkinter.Toplevel):
     def move_pawn(self, dice_result):
         self.player_pos1 = self.player_pos1 + dice_result  # calculate the new position of the player1
         # self.player_pos2 = self.player_pos2 + dice_result  # calculate the new position of the player2
+        self.canvas.coords(self.player_1, self.square_index[self.player_pos1][0],
+                           self.square_index[self.player_pos1][1])
+        self.after(100)
         if self.player_pos1 in self.ladders.keys():
             top_of_ladder = self.ladders[self.player_pos1]
             self.canvas.coords(self.player_1, self.square_index[top_of_ladder][0],
@@ -110,7 +115,7 @@ class Game(tkinter.Toplevel):
             self.canvas.coords(self.player_1, self.square_index[bottom_of_snake][0],
                                self.square_index[bottom_of_snake][1])
             self.player_pos1 = bottom_of_snake
-        else:
-            self.canvas.coords(self.player_1, self.square_index[self.player_pos1][0],
-                               self.square_index[self.player_pos1][1])
+        # else:
+        #     self.canvas.coords(self.player_1, self.square_index[self.player_pos1][0],
+        #                        self.square_index[self.player_pos1][1])
         # self.canvas.coords(self.player_2, self.square_index[self.player_pos2][0], self.square_index[self.player_pos2][1])
