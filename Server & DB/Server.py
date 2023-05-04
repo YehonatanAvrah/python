@@ -151,7 +151,6 @@ class Server:
             data = ["Wait", username]
             join_data = ",".join(data)
             self.send_msg(join_data, client_socket)
-            #client_socket.send(join_data.encode())
         elif len(self.players) == 2:
             print("2 players")
             player1 = self.players[0]
@@ -165,8 +164,6 @@ class Server:
             print("Sending data")
             self.send_msg(str_data2, socket1)
             self.send_msg(str_data1, socket2)
-            #socket1.send(str_data2.encode())
-            #socket2.send(str_data1.encode())
 
 
 if __name__ == '__main__':

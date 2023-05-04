@@ -4,7 +4,6 @@ from tkinter import *
 import tkinter.font as font
 from PIL import ImageTk, Image
 from GameSC import Game
-import time
 
 
 class Lobby(tkinter.Toplevel):

@@ -1,6 +1,7 @@
 import tkinter
 import random
 from tkinter import *
+import threading
 import tkinter.font as font
 from PIL import ImageTk, Image
 
@@ -10,6 +11,7 @@ class Game(tkinter.Toplevel):
         super().__init__(parent)
         self.client_handler = None
         self.parent = parent
+        self.main_parent = parent.parent.parent
         self.geometry("1800x1010")
         self.title('Game Screen - Snakes And Ladders')
         self.format = 'utf-8'
@@ -17,11 +19,12 @@ class Game(tkinter.Toplevel):
         self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
-        self.Username = str(parent.Username)  # self.parent.UserData.get()
+        self.Username = str(parent.parent.Username)  # self.parent.UserData.get()
         self.create_gui()
         self.get_index()
         self.snakes = {38: 2, 50: 14, 55: 34, 65: 37, 93: 75, 99: 64}
         self.ladders = {4: 36, 29: 73, 42: 60, 63: 85, 71: 89}
+        self.turn = 1
 
     def create_gui(self):
         # --------Board--------
@@ -57,6 +60,29 @@ class Game(tkinter.Toplevel):
         self.player_2 = self.canvas.create_image(180, 925, image=self.pawn_blue, anchor=S)
         self.player_pos2 = 0  # set the current position of the player2
 
+    def handle_game_turns(self):
+        self.client_handler = threading.Thread(target=self.player_turn, args=())
+        self.client_handler.daemon = True
+        self.client_handler.start()
+
+    def player_turn(self):
+        try:
+            print("wait for turn")
+            arr = ["Turn", self.Username]
+            str_insert = ",".join(arr)
+            print(str_insert)
+            self.main_parent.send_msg(str_insert, self.main_parent.client_socket)
+            data = self.main_parent.recv_msg(self.main_parent.client_socket)
+            print(data)
+            if data is not None:
+                if data == "MyTurn":  # current player turn
+                    print("Player turn")
+
+                elif data == "OpponentTurn":  # opponent player turn
+                    print("Opponents Turn")
+
+        except:
+            print("fail- game turn")
 
     def load_dice_nums(self):
         nums = ["../Photos/dice1.png", "../Photos/dice2.png", "../Photos/dice3.png", "../Photos/dice4.png",
@@ -100,21 +126,40 @@ class Game(tkinter.Toplevel):
         # print(self.square_index)
 
     def move_pawn(self, dice_result):
-        self.player_pos1 = self.player_pos1 + dice_result  # calculate the new position of the player1
-        # self.player_pos2 = self.player_pos2 + dice_result  # calculate the new position of the player2
-        self.canvas.coords(self.player_1, self.square_index[self.player_pos1][0],
-                           self.square_index[self.player_pos1][1])
-        self.after(300, self.check_ladder_or_snake)
+        print(self.turn)
+        if self.turn == 1:
+            self.player_pos1 = self.player_pos1 + dice_result  # calculate the new position of the player1
+            self.canvas.coords(self.player_1, self.square_index[self.player_pos1][0],
+                               self.square_index[self.player_pos1][1])
+            self.after(350, self.check_ladder_or_snake)
+            self.turn = 2
+        elif self.turn == 2:
+            self.player_pos2 = self.player_pos2 + dice_result  # calculate the new position of the player1
+            self.canvas.coords(self.player_2, self.square_index[self.player_pos2][0],
+                               self.square_index[self.player_pos2][1])
+            self.after(350, self.check_ladder_or_snake)
+            self.turn = 1
 
     def check_ladder_or_snake(self):
-        if self.player_pos1 in self.ladders.keys():
-            top_of_ladder = self.ladders[self.player_pos1]
-            self.canvas.coords(self.player_1, self.square_index[top_of_ladder][0],
-                               self.square_index[top_of_ladder][1])
-            self.player_pos1 = top_of_ladder
-        elif self.player_pos1 in self.snakes.keys():
-            bottom_of_snake = self.snakes[self.player_pos1]
-            self.canvas.coords(self.player_1, self.square_index[bottom_of_snake][0],
-                               self.square_index[bottom_of_snake][1])
-            self.player_pos1 = bottom_of_snake
-        # self.canvas.coords(self.player_2, self.square_index[self.player_pos2][0], self.square_index[self.player_pos2][1])
+        if self.turn == 1:
+            if self.player_pos1 in self.ladders.keys():
+                top_of_ladder = self.ladders[self.player_pos1]
+                self.canvas.coords(self.player_1, self.square_index[top_of_ladder][0],
+                                   self.square_index[top_of_ladder][1])
+                self.player_pos1 = top_of_ladder
+            elif self.player_pos1 in self.snakes.keys():
+                bottom_of_snake = self.snakes[self.player_pos1]
+                self.canvas.coords(self.player_1, self.square_index[bottom_of_snake][0],
+                                   self.square_index[bottom_of_snake][1])
+                self.player_pos1 = bottom_of_snake
+        elif self.turn == 2:
+            if self.player_pos2 in self.ladders.keys():
+                top_of_ladder = self.ladders[self.player_pos2]
+                self.canvas.coords(self.player_2, self.square_index[top_of_ladder][0],
+                                   self.square_index[top_of_ladder][1])
+                self.player_pos2 = top_of_ladder
+            elif self.player_pos2 in self.snakes.keys():
+                bottom_of_snake = self.snakes[self.player_pos2]
+                self.canvas.coords(self.player_2, self.square_index[bottom_of_snake][0],
+                                   self.square_index[bottom_of_snake][1])
+                self.player_pos2 = bottom_of_snake
