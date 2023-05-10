@@ -10,7 +10,7 @@ class Lobby(tkinter.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.client_handler = None
-        self.parent = parent
+        self.parent = parent  # menu
         self.geometry("750x600")
         self.title('Lobby')
         self.format = 'utf-8'
