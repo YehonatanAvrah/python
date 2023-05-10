@@ -23,13 +23,13 @@ class Game(tkinter.Toplevel):
         self.opponent_name = self.get_opp_name()
         self.player_id1 = None
         self.player_id2 = None
-        self.set_player_id()
         self.current_player = None
+        self.set_player_id()
         self.create_gui()
         self.get_index()
         self.snakes = {38: 2, 50: 14, 55: 34, 65: 37, 93: 75, 99: 64}  # top to bottom
         self.ladders = {4: 36, 29: 73, 42: 60, 63: 85, 71: 89}  # bottom to top
-        self.game_engine()
+        self.handle_recv_dice_result()
 
     def create_gui(self):
         # --------Board--------
@@ -92,25 +92,15 @@ class Game(tkinter.Toplevel):
             print("set id")
             self.main_parent.send_msg("GetID", self.main_parent.client_socket)
             data = self.main_parent.recv_msg(self.main_parent.client_socket)
-            print(data)
-            if data == self.Username:
+            print("The first player who entered the lobby: " + str(data))
+            if str(data) == self.Username:
                 self.player_id1 = self.Username
                 self.player_id2 = self.opponent_name
-            elif data == self.opponent_name:
+            elif str(data) == self.opponent_name:
                 self.player_id1 = self.opponent_name
                 self.player_id2 = self.Username
         except:
             print("FAIL- set id")
-
-    def game_engine(self):
-        def check_button_state():
-            state = self.btn_roll.cget("state")
-            if state == "disabled":
-                self.recv_dice_result()
-            else:
-                self.after(100, check_button_state)  # Schedule next check after 100 milliseconds
-
-        check_button_state()
 
     def player_turn(self):
         try:
@@ -158,20 +148,17 @@ class Game(tkinter.Toplevel):
         client_handler.start()
 
     def recv_dice_result(self):
-        #while True:
         data = self.main_parent.recv_msg(self.main_parent.client_socket)
-        print(data)
-        data = ",".split(data)
-        print(data)
-        if data == "WaitResult":
-            pass
-        elif data[0] == "ResExist":
-            res = int(data[1])
-            print("This is the result of the opponent: " + str(res))
-            self.after(100, self.move_pawn, res)
+        print("Received data:", data)
+        data = data.split(",")
+        if data[0] == "ResExist":
+            print("Opponent's result exists.")
+            result = int(data[1])
+            print("Opponent's result:", result)
+            self.after(100, self.move_pawn, result)
             self.btn_roll.configure(state="active")
         else:
-            pass
+            print("Invalid data received:", data)
 
     def roll_dice(self):
         r = random.randint(1, 6)
@@ -218,12 +205,14 @@ class Game(tkinter.Toplevel):
             self.canvas.coords(self.player_1, self.square_index[self.player_pos1][0],
                                self.square_index[self.player_pos1][1])
             self.after(350, self.check_ladder_or_snake)
+            self.current_player = self.player_id2
             #self.after(100, self.player_turn)
         elif self.current_player == self.player_id2:
             self.player_pos2 = self.player_pos2 + dice_result  # calculate the new position of the player1
             self.canvas.coords(self.player_2, self.square_index[self.player_pos2][0],
                                self.square_index[self.player_pos2][1])
             self.after(350, self.check_ladder_or_snake)
+            self.current_player = self.player_id1
             #self.after(100, self.player_turn)
 
     def check_ladder_or_snake(self):
