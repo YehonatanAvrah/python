@@ -41,13 +41,13 @@ class MainWindow(tkinter.Tk):  # create a window
 
         # ====================Labels & Entries======================
         self.Email = StringVar()
-        # self.EmailLbl = Label(self, text="Email: ", width=10, font=self.LblFont, bg='#AC94F4')  # place a label on the window
-        # self.EmailLbl.place(x=100, y=25)
+        self.EmailLbl = Label(self, text="Email: ", width=10, font=self.LblFont, bg='#AC94F4')  # place a label on the window
+        self.EmailLbl.place(x=100, y=25)
         self.EntEmail = Entry(self, textvariable=self.Email, border=0, font=self.LblFont)
-        self.EntEmail.place(x=100, y=25)  # x=225, y=25
-        self.EntEmail.insert(0, "Email")
-        self.EntEmail.bind('<FocusIn>', self.email_enter)
-        self.EntEmail.bind('<FocusOut>', self.email_leave)
+        self.EntEmail.place(x=225, y=25)  # x=100, y=25
+        # self.EntEmail.insert(0, "Email")
+        # self.EntEmail.bind('<FocusIn>', self.email_enter)
+        # self.EntEmail.bind('<FocusOut>', self.email_leave)
 
         self.Password = StringVar()
         self.PasswordLbl = Label(self, text="Password: ", width=10, font=self.LblFont, bg='#AC94F4')

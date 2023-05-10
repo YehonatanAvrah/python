@@ -10,8 +10,8 @@ class Game(tkinter.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.client_handler = None
-        self.parent = parent
-        self.main_parent = parent.parent.parent
+        self.parent = parent  # lobby
+        self.main_parent = parent.parent.parent  # login
         self.geometry("1800x1010")
         self.title('Game Screen - Snakes And Ladders')
         self.format = 'utf-8'
@@ -19,12 +19,17 @@ class Game(tkinter.Toplevel):
         self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
-        self.Username = str(parent.parent.Username)  # self.parent.UserData.get()
+        self.Username = str(self.parent.Username)
+        self.opponent_name = self.get_opp_name()
+        self.player_id1 = None
+        self.player_id2 = None
+        self.set_player_id()
+        self.current_player = None
         self.create_gui()
         self.get_index()
-        self.snakes = {38: 2, 50: 14, 55: 34, 65: 37, 93: 75, 99: 64}
-        self.ladders = {4: 36, 29: 73, 42: 60, 63: 85, 71: 89}
-        self.turn = 1
+        self.snakes = {38: 2, 50: 14, 55: 34, 65: 37, 93: 75, 99: 64}  # top to bottom
+        self.ladders = {4: 36, 29: 73, 42: 60, 63: 85, 71: 89}  # bottom to top
+        self.game_engine()
 
     def create_gui(self):
         # --------Board--------
@@ -36,6 +41,10 @@ class Game(tkinter.Toplevel):
         self.start_resize = self.start.resize((150, 150), Image.Resampling.LANCZOS)
         self.start_point = ImageTk.PhotoImage(self.start_resize)
         self.canvas.create_image(150, 975, image=self.start_point, anchor=S)
+        self.current_player = self.player_id1
+        self.turn_lbl = Label(self, text=self.current_player + "'s turn!", width=20, height=5, font=self.LblFont,
+                              fg="red", bg="yellow")
+        self.turn_lbl.place(x=1200, y=110)
 
         # --------Dice--------
         self.arr_dice = []
@@ -46,6 +55,10 @@ class Game(tkinter.Toplevel):
         self.btn_roll = Button(self, image=self.dice_icon, command=self.roll_dice, height=80, width=80,
                                background="#AC94F4", activebackground="#AC94F4")
         self.btn_roll.place(x=1300, y=300)
+        if self.Username != self.player_id1:
+            self.btn_roll.configure(state="disabled")
+        else:
+            self.btn_roll.configure(state="active")
 
         # --------pawns--------
         self.pawn1 = Image.open("../Photos/red_pawn.png")
@@ -60,27 +73,73 @@ class Game(tkinter.Toplevel):
         self.player_2 = self.canvas.create_image(180, 925, image=self.pawn_blue, anchor=S)
         self.player_pos2 = 0  # set the current position of the player2
 
-    def handle_game_turns(self):
-        self.client_handler = threading.Thread(target=self.player_turn, args=())
-        self.client_handler.daemon = True
-        self.client_handler.start()
+    def get_opp_name(self):
+        try:
+            print("oppo name")
+            arr = ["GetOppoName", self.Username]
+            str_insert = ",".join(arr)
+            print(str_insert)
+            self.main_parent.send_msg(str_insert, self.main_parent.client_socket)
+            data = self.main_parent.recv_msg(self.main_parent.client_socket)
+            print(data)
+            return data
+        except:
+            print("FAIL- GetOppoName")
+            return "FAIL- GetOppoName"
+
+    def set_player_id(self):
+        try:
+            print("set id")
+            self.main_parent.send_msg("GetID", self.main_parent.client_socket)
+            data = self.main_parent.recv_msg(self.main_parent.client_socket)
+            print(data)
+            if data == self.Username:
+                self.player_id1 = self.Username
+                self.player_id2 = self.opponent_name
+            elif data == self.opponent_name:
+                self.player_id1 = self.opponent_name
+                self.player_id2 = self.Username
+        except:
+            print("FAIL- set id")
+
+    def game_engine(self):
+        def check_button_state():
+            state = self.btn_roll.cget("state")
+            if state == "disabled":
+                self.recv_dice_result()
+            else:
+                self.after(100, check_button_state)  # Schedule next check after 100 milliseconds
+
+        check_button_state()
 
     def player_turn(self):
         try:
-            print("wait for turn")
-            arr = ["Turn", self.Username]
+            print("Finished his turn")
+            arr = ["TurnFinish", self.Username]
             str_insert = ",".join(arr)
             print(str_insert)
             self.main_parent.send_msg(str_insert, self.main_parent.client_socket)
             data = self.main_parent.recv_msg(self.main_parent.client_socket)
             print(data)
             if data is not None:
-                if data == "MyTurn":  # current player turn
-                    print("Player turn")
-
-                elif data == "OpponentTurn":  # opponent player turn
-                    print("Opponents Turn")
-
+                if data == "PlayerID1Turn":  # player1 turn
+                    print("Player_id1 turn")
+                    self.current_player = self.player_id1
+                    # self.turn = 1
+                    self.turn_lbl.config(text=self.current_player + "'s turn!")
+                    if self.Username != self.current_player:
+                        self.btn_roll.configure(state="disabled")
+                    else:
+                        self.btn_roll.configure(state="active")
+                elif data == "PlayerID2Turn":  # player2 turn
+                    print("Player_id2 Turn")
+                    self.current_player = self.player_id2
+                    # self.turn = 2
+                    self.turn_lbl.config(text=self.current_player + "'s turn!")
+                    if self.Username != self.current_player:
+                        self.btn_roll.configure(state="disabled")
+                    else:
+                        self.btn_roll.configure(state="active")
         except:
             print("fail- game turn")
 
@@ -93,12 +152,39 @@ class Game(tkinter.Toplevel):
             self.dice_num = ImageTk.PhotoImage(self.dice_num_resize)
             self.arr_dice.append(self.dice_num)
 
+    def handle_recv_dice_result(self):
+        client_handler = threading.Thread(target=self.recv_dice_result, args=())
+        client_handler.daemon = True
+        client_handler.start()
+
+    def recv_dice_result(self):
+        #while True:
+        data = self.main_parent.recv_msg(self.main_parent.client_socket)
+        print(data)
+        data = ",".split(data)
+        print(data)
+        if data == "WaitResult":
+            pass
+        elif data[0] == "ResExist":
+            res = int(data[1])
+            print("This is the result of the opponent: " + str(res))
+            self.after(100, self.move_pawn, res)
+            self.btn_roll.configure(state="active")
+        else:
+            pass
+
     def roll_dice(self):
         r = random.randint(1, 6)
         # print(r)
         self.btn_roll.config(image=self.arr_dice[r - 1])
+        self.btn_roll.configure(state="disabled")
+        print("current player playing:" + self.current_player)
+        #if self.current_player == self.Username:
+        arr = ["DiceResult", str(r), self.Username]
+        str_insert = ",".join(arr)
+        print(str_insert)
+        self.main_parent.send_msg(str_insert, self.main_parent.client_socket)
         self.after(300, self.move_pawn, r)
-
 
     def get_index(self):
         # X- difference of 100 btwn each square, Y- difference of 80 btwn each square
@@ -126,22 +212,22 @@ class Game(tkinter.Toplevel):
         # print(self.square_index)
 
     def move_pawn(self, dice_result):
-        print(self.turn)
-        if self.turn == 1:
+        # print(self.current_player)
+        if self.current_player == self.player_id1:
             self.player_pos1 = self.player_pos1 + dice_result  # calculate the new position of the player1
             self.canvas.coords(self.player_1, self.square_index[self.player_pos1][0],
                                self.square_index[self.player_pos1][1])
             self.after(350, self.check_ladder_or_snake)
-            self.turn = 2
-        elif self.turn == 2:
+            #self.after(100, self.player_turn)
+        elif self.current_player == self.player_id2:
             self.player_pos2 = self.player_pos2 + dice_result  # calculate the new position of the player1
             self.canvas.coords(self.player_2, self.square_index[self.player_pos2][0],
                                self.square_index[self.player_pos2][1])
             self.after(350, self.check_ladder_or_snake)
-            self.turn = 1
+            #self.after(100, self.player_turn)
 
     def check_ladder_or_snake(self):
-        if self.turn == 1:
+        if self.current_player == self.player_id1:
             if self.player_pos1 in self.ladders.keys():
                 top_of_ladder = self.ladders[self.player_pos1]
                 self.canvas.coords(self.player_1, self.square_index[top_of_ladder][0],
@@ -152,7 +238,7 @@ class Game(tkinter.Toplevel):
                 self.canvas.coords(self.player_1, self.square_index[bottom_of_snake][0],
                                    self.square_index[bottom_of_snake][1])
                 self.player_pos1 = bottom_of_snake
-        elif self.turn == 2:
+        elif self.current_player == self.player_id2:
             if self.player_pos2 in self.ladders.keys():
                 top_of_ladder = self.ladders[self.player_pos2]
                 self.canvas.coords(self.player_2, self.square_index[top_of_ladder][0],

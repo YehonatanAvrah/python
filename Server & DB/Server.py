@@ -122,6 +122,22 @@ class Server:
                     print("enter lobby " + arr[1])
                     self.handle_lobby(arr[1], client_socket)  # arr[1] = username
 
+                elif arr and cmd == "GetOppoName" and len(arr) == 2:
+                    print(arr[1] + "is requesting for opponent's name")
+                    self.get_names(arr[1])  # arr[1] = username
+
+                elif arr and cmd == "GetID" and len(arr) == 1:
+                    print("Get order of entrance to game")
+                    self.get_id()
+
+                elif arr and cmd == "TurnFinish" and len(arr) == 2:
+                    print("Check turn")
+                    self.handle_game(arr[1])  # arr[1] = username
+
+                elif arr and cmd == "DiceResult" and len(arr) == 3:
+                    print(f"Dice result: {arr[1]}")
+                    self.handle_dice(arr[1], arr[2])  # arr[1] = result, arr[2] = username
+
                 elif arr and cmd == "exit" and len(arr) == 1:
                     print("exit")
                     running = False  # change the variable to exit the loop
@@ -164,6 +180,51 @@ class Server:
             print("Sending data")
             self.send_msg(str_data2, socket1)
             self.send_msg(str_data1, socket2)
+
+    def handle_game(self, username):
+        print("handle game")
+        player1 = self.players[0]
+        player2 = self.players[1]
+        if username == player1.name:
+            print(f"{player2.name} turn")
+            self.send_msg("PlayerID2Turn", player1.client_socket)
+            self.send_msg("PlayerID2Turn", player2.client_socket)
+        elif username == player2.name:
+            print(f"{player1.name} turn")
+            self.send_msg("PlayerID1Turn", player1.client_socket)
+            self.send_msg("PlayerID1Turn", player2.client_socket)
+
+    def handle_dice(self, result, username):
+        print("dice result")
+        player1 = self.players[0]
+        player2 = self.players[1]
+        data = ["ResExist", result]
+        str_data = ",".join(data)
+        if username == player1.name:
+            print(f"{player1.name} dice result")
+            self.send_msg(str_data, player2.client_socket)
+           # self.send_msg("WaitResult", player1.client_socket)
+            #self.send_msg("PlayerID2Turn", player2.client_socket)
+        elif username == player2.name:
+            print(f"{player2.name} dice result")
+            self.send_msg(str_data, player1.client_socket)
+           # self.send_msg("WaitResult", player2.client_socket)
+
+    def get_names(self, username):
+        player1 = self.players[0]
+        player2 = self.players[1]
+        print(f"{player1.name, player2.name}")
+        if player1.name == username:
+            self.send_msg(player2.name, player1.client_socket)
+        elif player2.name == username:
+            self.send_msg(player1.name, player2.client_socket)
+
+    def get_id(self):
+        player1 = self.players[0]
+        player2 = self.players[1]
+        print(f"{player1.name, player2.name}")
+        self.send_msg(player1.name, player1.client_socket)  # sending the first player who entered the lobby
+        self.send_msg(player1.name, player2.client_socket)
 
 
 if __name__ == '__main__':
