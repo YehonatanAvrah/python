@@ -29,7 +29,7 @@ class Game(tkinter.Toplevel):
         self.get_index()
         self.snakes = {38: 2, 50: 14, 55: 34, 65: 37, 93: 75, 99: 64}  # top to bottom
         self.ladders = {4: 36, 29: 73, 42: 60, 63: 85, 71: 89}  # bottom to top
-        self.handle_recv_dice_result()
+        self.handle_recv_dice_result()  # collide with set id probably
 
     def create_gui(self):
         # --------Board--------
