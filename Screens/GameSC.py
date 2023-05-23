@@ -26,7 +26,6 @@ class Game(tkinter.Toplevel):
         self.player_id2 = None
         self.current_player = None
         self.set_player_id()
-        self.flag = True
         self.create_gui()
         self.get_index()
         self.snakes = {38: 2, 50: 14, 55: 34, 65: 37, 93: 75, 99: 64}  # top to bottom
@@ -49,10 +48,16 @@ class Game(tkinter.Toplevel):
         self.start_resize = self.start.resize((150, 150), Image.Resampling.LANCZOS)
         self.start_point = ImageTk.PhotoImage(self.start_resize)
         self.canvas.create_image(150, 975, image=self.start_point, anchor=S)
+
+        # --------Labels--------
         self.current_player = self.player_id1
         self.turn_lbl = Label(self, text=self.current_player + "'s turn!", width=20, height=5, font=self.LblFont,
                               fg="red", bg="yellow")
         self.turn_lbl.place(x=1200, y=110)
+        if self.current_player != self.Username:
+            self.turn_lbl.config(text=self.current_player + "'s turn!")
+        else:
+            self.turn_lbl.config(text="Your turn!")
 
         # --------Dice--------
         self.arr_dice = []
@@ -158,7 +163,7 @@ class Game(tkinter.Toplevel):
         client_handler.daemon = True
         client_handler.start()
 
-    def recv_dice_result(self):
+    def recv_dice_result(self):  # fail here
         try:
             while self.running:
                 state = self.btn_roll.cget("state")
