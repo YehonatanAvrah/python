@@ -171,23 +171,28 @@ class MainWindow(tkinter.Tk):  # create a window
             print("Error with sending msg")
 
     def recv_msg(self, client_socket, ret_type="string"):  # ret_type is string by default unless stated otherwise
-        #try:
-        length = client_socket.recv(SIZE).decode(self.format)
-        if not length:
-            print("NO LENGTH!")
-            return None
-        print("The length is " + length)
-        data = client_socket.recv(int(length))  # .decode(self.format)
-        if not data:
-            print("NO DATA!")
-            return None
-        print("The data is: " + str(data))
-        if ret_type == "string":
-            data = data.decode(self.format)
-        print(data)
-        return data
-        #except:
-            #print("Error with receiving msg")
+        try:
+            length = client_socket.recv(SIZE).decode(self.format)
+            if not length:
+                print("NO LENGTH!")
+                return None
+            print("The length is " + length)
+            data = b""
+            remaining = int(length)
+            while remaining > 0:
+                chunk = client_socket.recv(remaining)
+                if not chunk:
+                    print("NO DATA!")
+                    return None
+                data += chunk
+                remaining -= len(chunk)
+            print("The data is: " + str(data))
+            if ret_type == "string":
+                data = data.decode(self.format)
+            print(data)
+            return data
+        except:
+            print("Error with receiving msg")
 
 
 if __name__ == "__main__":
