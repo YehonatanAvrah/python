@@ -4,6 +4,7 @@ import tkinter
 from tkinter import *
 import tkinter.font as font
 from PIL import ImageTk, Image
+from tkinter import messagebox
 from tkinter.messagebox import showerror
 from RegistrySC import Register
 from MenuSC import Menu
@@ -16,6 +17,7 @@ class MainWindow(tkinter.Tk):  # create a window
         super().__init__()
         self.title('Snakes and Ladders')
         self.geometry("1000x500")
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.canvas = Canvas(width=1000, height=500, bg='#AC94F4')
         self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
@@ -84,6 +86,11 @@ class MainWindow(tkinter.Tk):  # create a window
     def clear(self):
         self.EntEmail.delete(0, END)
         self.EntPass.delete(0, END)
+
+    def on_closing(self):
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            self.send_msg("exit", self.client_socket)
+            self.destroy()
 
     def email_enter(self, event):
         self.EntEmail.delete(0, END)
@@ -164,25 +171,28 @@ class MainWindow(tkinter.Tk):  # create a window
             print("Error with sending msg")
 
     def recv_msg(self, client_socket, ret_type="string"):  # ret_type is string by default unless stated otherwise
-        try:
-            length = client_socket.recv(SIZE).decode(self.format)
-            if not length:
-                print("NO LENGTH!")
-                return None
-            print("The length is " + length)
-            data = client_socket.recv(int(length))  # .decode(self.format)
-            if not data:
-                print("NO DATA!")
-                return None
-            print("The data is: " + str(data))
-            if ret_type == "string":
-                data = data.decode(self.format)
-            print(data)
-            return data
-        except:
-            print("Error with receiving msg")
+        #try:
+        length = client_socket.recv(SIZE).decode(self.format)
+        if not length:
+            print("NO LENGTH!")
+            return None
+        print("The length is " + length)
+        data = client_socket.recv(int(length))  # .decode(self.format)
+        if not data:
+            print("NO DATA!")
+            return None
+        print("The data is: " + str(data))
+        if ret_type == "string":
+            data = data.decode(self.format)
+        print(data)
+        return data
+        #except:
+            #print("Error with receiving msg")
 
 
 if __name__ == "__main__":
     M = MainWindow()
-    M.mainloop()  # keep the window displaying
+    try:
+        M.mainloop()  # keep the window displaying
+    except KeyboardInterrupt:
+        pass

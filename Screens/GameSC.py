@@ -34,6 +34,11 @@ class Game(tkinter.Toplevel):
         self.handle_recv_dice_result()
 
     def create_gui(self):
+        # ====================Icon======================
+        self.icon = PhotoImage(file="../Photos/SAL_icon.png")
+        self.iconphoto(False, self.icon)
+        self.logo_photo = Image.open("../Photos/SAL_Logo.png")
+
         # --------Board--------
         self.board = Image.open("../Photos/Game_Board.png")  # Cyber/ProjectSAL/Photos/Game_Board.png
         self.board_resize = self.board.resize((1000, 800), Image.Resampling.LANCZOS)
@@ -165,7 +170,8 @@ class Game(tkinter.Toplevel):
                     result = int(data[1])
                     print("Opponent's result:", result)
                     self.after(100, self.move_pawn, result)
-                    self.btn_roll.configure(state="active")
+                    self.after(200, self.btn_roll.configure(state="active"))
+                    # self.btn_roll.configure(state="active")
                 else:
                     print("Invalid data received:", data)
             else:
@@ -176,9 +182,9 @@ class Game(tkinter.Toplevel):
         r = random.randint(1, 6)
         # print(r)
         self.btn_roll.config(image=self.arr_dice[r - 1])
-        self.btn_roll.configure(state="disabled")
+        self.after(300, self.btn_roll.configure(state="disabled"))
+        # self.btn_roll.configure(state="disabled")
         print("current player playing: " + self.current_player)
-        #if self.current_player == self.Username:
         arr = ["DiceResult", str(r), self.Username]
         str_insert = ",".join(arr)
         print(str_insert)
@@ -270,9 +276,10 @@ class Game(tkinter.Toplevel):
         self.withdraw()
 
     def handle_winner(self):
-        arr = ["winner", self.Username]
+        arr = ["WinnerExist", self.current_player]
         str_insert = ",".join(arr)
         print(str_insert)
         self.main_parent.send_msg(str_insert, self.main_parent.client_socket)
+        self.open_win_screen()
 
 

@@ -1,7 +1,7 @@
 import tkinter
 from tkinter import *
 import tkinter.font as font
-from PIL import ImageTk, Image
+from PIL import Image
 
 
 class Winning_Screen(tkinter.Toplevel):
@@ -21,9 +21,9 @@ class Winning_Screen(tkinter.Toplevel):
         self.opponent_name = self.parent.opponent_name
         self.winner = None
         self.loser = None
-        self.set_winner()
+        self.get_winner()
 
-        # ====================Logo and Icon======================
+        # ====================Icon======================
         self.icon = PhotoImage(file="../Photos/SAL_icon.png")
         self.iconphoto(False, self.icon)
         self.logo_photo = Image.open("../Photos/SAL_Logo.png")
@@ -33,12 +33,12 @@ class Winning_Screen(tkinter.Toplevel):
     def create_gui(self):
         # ====================Labels======================
         print(self.Username)
-        self.canvas.create_text(400, 120, text=f"WINNER: , {self.winner}", fill="black", font=self.LblFont)
-        self.canvas.create_text(400, 120, text=f"LOSER: , {self.loser}", fill="black", font=self.LblFont)
+        self.canvas.create_text(400, 120, text=f"WINNER: {self.winner}", fill="black", font=self.LblFont)
+        self.canvas.create_text(400, 180, text=f"LOSER: {self.loser}", fill="black", font=self.LblFont)
 
-    def set_winner(self):
+    def get_winner(self):
         try:
-            print("set winner")
+            print("get winner")
             arr = ["GetWinner", self.Username]
             str_insert = ",".join(arr)
             print(str_insert)

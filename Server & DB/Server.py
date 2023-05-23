@@ -1,6 +1,7 @@
 import socket
 import threading
 from UsersDB import *
+from GameHistoryDB import *
 from Player import *
 
 SIZE = 8
@@ -16,7 +17,9 @@ class Server:
         self.format = 'utf-8'
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Create a socket
         self.userDb = Users()
+        self.historyDb = GameHistory()
         self.players = []
+        self.winners = []
 
     def start_server(self):
         try:
@@ -130,20 +133,24 @@ class Server:
                     print(arr[1] + " is requesting for first player's name")
                     self.get_id(arr[1])  # arr[1] = username
 
-                elif arr and cmd == "TurnFinish" and len(arr) == 2:
-                    print("Check turn")
-                    self.handle_game(arr[1])  # arr[1] = username
-
                 elif arr and cmd == "DiceResult" and len(arr) == 3:
                     print(f"Dice result: {arr[1]}")
                     self.handle_dice(arr[1], arr[2])  # arr[1] = result, arr[2] = username
 
+                elif arr and cmd == "WinnerExist" and len(arr) == 2:
+                    print(arr[1] + " sent the winner")
+                    self.set_winner(arr[1])  # arr[1] = username
+
+                elif arr and cmd == "GetWinner" and len(arr) == 2:
+                    print(arr[1] + " is requesting for the winner's name")
+                    self.get_winner(arr[1])  # arr[1] = username
+
                 elif arr and cmd == "exit" and len(arr) == 1:
                     print("exit")
                     running = False  # change the variable to exit the loop
-                    server_data = "You've successfully disconnected"
+                    # server_data = "You've successfully disconnected"
                     self.count -= 1
-                    self.send_msg(server_data, client_socket)
+                    # self.send_msg(server_data, client_socket)
 
                 else:  # if the data from the client is false according to the protocol
                     server_data = "Please send data according to protocol"
@@ -203,12 +210,12 @@ class Server:
         if username == player1.name:
             print(f"{player1.name}'s dice result")
             self.send_msg(str_data, player2.client_socket)
-           # self.send_msg("WaitResult", player1.client_socket)
-            #self.send_msg("PlayerID2Turn", player2.client_socket)
+            # self.send_msg("WaitResult", player1.client_socket)
+            # self.send_msg("PlayerID2Turn", player2.client_socket)
         elif username == player2.name:
             print(f"{player2.name}'s dice result")
             self.send_msg(str_data, player1.client_socket)
-           # self.send_msg("WaitResult", player2.client_socket)
+            # self.send_msg("WaitResult", player2.client_socket)
 
     def get_names(self, username):
         player1 = self.players[0]
@@ -230,14 +237,25 @@ class Server:
         # self.send_msg(player1.name, player1.client_socket)  # sending the first player who entered the lobby
         # self.send_msg(player1.name, player2.client_socket)
 
-    def get_winner(self, winner):
+    def set_winner(self, winner):
         player1 = self.players[0]
         player2 = self.players[1]
-        print(f"{player1.name, player2.name}")
+        self.winner = None
+        print(f"players: {player1.name, player2.name}, winner: {winner}")
         if player1.name == winner:
-            self.send_msg(player1.name, player1.client_socket)
+            self.winner = player1.name
         elif player2.name == winner:
-            self.send_msg(player1.name, player2.client_socket)
+            self.winner = player2.name
+        self.historyDb.insert_players(player1, player2, self.winner)
+        self.userDb.update_wins(self.winner)
+
+    def get_winner(self, username):
+        player1 = self.players[0]
+        player2 = self.players[1]
+        if player1.name == username:
+            self.send_msg(self.winner, player1.client_socket)
+        elif player2.name == username:
+            self.send_msg(self.winner, player2.client_socket)
 
 
 if __name__ == '__main__':

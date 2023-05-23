@@ -1,4 +1,5 @@
 import sqlite3
+import hashlib
 # def update - one for every category or a general one; update wins - need to add
 
 
@@ -32,11 +33,13 @@ class Users:
         try:
             conn = sqlite3.connect('Users.db')
             print("Opened database successfully")  # check if worked
+            salt = 'AnyaWakuWakuSecret'  # secret key
+            salt_pswrd = hashlib.md5(salt.encode('utf-8') + password.encode('utf-8')).hexdigest()
+            print(salt_pswrd)
             str_insert = f"INSERT INTO {self.__tablename} ({self.__email}, {self.__password}, {self.__firstname}," \
-                         f" {self.__lastname}, {self.__username}, {self.__wins}) VALUES ('{email}', '{password}'," \
-                         f" '{firstname}', '{lastname}', '{username}', '{0}')"
-            print(str_insert)
-            conn.execute(str_insert)
+                         f" {self.__lastname}, {self.__username}, {self.__wins}) VALUES (?, ?, ?, ?, ?, ?)"
+            params = (email, salt_pswrd, firstname, lastname, username, 0)
+            conn.execute(str_insert, params)
             conn.commit()
             conn.close()
             print("Record created successfully")
@@ -45,12 +48,14 @@ class Users:
             print("Failed to insert user")
             return False
 
-    def ret_user_by_email_and_pswrd(self, email, pswrd):
+    def ret_user_by_email_and_pswrd(self, email, password):
         try:
             conn = sqlite3.connect('Users.db')
             print("Opened database successfully") # check if worked
+            salt = 'AnyaWakuWakuSecret'  # secret key
+            salt_pswrd = hashlib.md5(salt.encode('utf-8') + password.encode('utf-8')).hexdigest()
             strsql = f"SELECT * from {self.__tablename} where {self.__email} = '{str(email)}' AND " \
-                     f"{self.__password} = '{str(pswrd)}'"
+                     f"{self.__password} = '{str(salt_pswrd)}'"
             print(strsql)
             cursor = conn.execute(strsql)
             print(cursor)
@@ -131,6 +136,21 @@ class Users:
     def get_table_name(self):
         return "The name of the table is " + self.__tablename
 
+    def update_wins(self, username):
+        try:
+            conn = sqlite3.connect('Users.db')
+            print("Opened database successfully")  # check if worked
+            cur_wins = self.get_all_wins(username)
+            new_wins = cur_wins + 1
+            str_update = f"update {self.__tablename} set {self.__wins} = '{new_wins}'"
+            print(str_update)
+            conn.execute(str_update)
+            conn.commit()
+            conn.close()
+            print("The user's wins was successfully updated")
+            return "Success update wins"
+        except:
+            return "Failed to update user's wins"
 
 # u = Users()
 # u.insert_user('Johnny@gmail.com', "Johnny", "Av", "JohnnyAV", "pass123")
