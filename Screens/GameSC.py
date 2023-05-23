@@ -31,6 +31,7 @@ class Game(tkinter.Toplevel):
         self.get_index()
         self.snakes = {38: 2, 50: 14, 55: 34, 65: 37, 93: 75, 99: 64}  # top to bottom
         self.ladders = {4: 36, 29: 73, 42: 60, 63: 85, 71: 89}  # bottom to top
+        self.running = True
         self.handle_recv_dice_result()
 
     def create_gui(self):
@@ -158,25 +159,28 @@ class Game(tkinter.Toplevel):
         client_handler.start()
 
     def recv_dice_result(self):
-        while True:
-            state = self.btn_roll.cget("state")
-            # print("Button state:", state)
-            if state == "disabled":
-                data = self.main_parent.recv_msg(self.main_parent.client_socket)
-                print("Received data:", data)
-                data = data.split(",")
-                if data[0] == "ResExist":
-                    print("Opponent's result exists.")
-                    result = int(data[1])
-                    print("Opponent's result:", result)
-                    self.after(100, self.move_pawn, result)
-                    self.after(200, self.btn_roll.configure(state="active"))
-                    # self.btn_roll.configure(state="active")
+        try:
+            while self.running:
+                state = self.btn_roll.cget("state")
+                # print("Button state:", state)
+                if state == "disabled":
+                    data = self.main_parent.recv_msg(self.main_parent.client_socket)
+                    print("Received data:", data)
+                    data = data.split(",")
+                    if data[0] == "ResExist":
+                        print("Opponent's result exists.")
+                        result = int(data[1])
+                        print("Opponent's result:", result)
+                        self.after(100, self.move_pawn, result)
+                        self.after(200, self.btn_roll.configure(state="active"))
+                        # self.btn_roll.configure(state="active")
+                    else:
+                        print("Invalid data received:", data)
                 else:
-                    print("Invalid data received:", data)
-            else:
-                # print("Receive operation skipped when the button is active")
-                pass
+                    # print("Receive operation skipped when the button is active")
+                    pass
+        except:
+            print("failed in recv_dice_res")
 
     def roll_dice(self):
         r = random.randint(1, 6)
@@ -227,8 +231,12 @@ class Game(tkinter.Toplevel):
             self.after(350, self.check_ladder_or_snake)
             if self.player_pos1 != 100:
                 self.current_player = self.player_id2
-                self.turn_lbl.config(text=self.current_player + "'s turn!")
+                if self.current_player != self.Username:
+                    self.turn_lbl.config(text=self.current_player + "'s turn!")
+                else:
+                    self.turn_lbl.config(text="Your turn!")
             else:
+                self.running = False
                 self.handle_winner()
             #self.after(100, self.player_turn)
         elif self.current_player == self.player_id2:
@@ -240,8 +248,12 @@ class Game(tkinter.Toplevel):
             self.after(350, self.check_ladder_or_snake)
             if self.player_pos2 != 100:
                 self.current_player = self.player_id1
-                self.turn_lbl.config(text=self.current_player + "'s turn!")
+                if self.current_player != self.Username:
+                    self.turn_lbl.config(text=self.current_player + "'s turn!")
+                else:
+                    self.turn_lbl.config(text="Your turn!")
             else:
+                self.running = False
                 self.handle_winner()
 
             #self.after(100, self.player_turn)
