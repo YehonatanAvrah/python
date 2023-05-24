@@ -30,7 +30,7 @@ class MainWindow(tkinter.Tk):  # create a window
 
         # ====================Logo and Icon======================
         self.icon = PhotoImage(file="../Photos/SAL_icon.png")
-        self.iconphoto(False, self.icon)
+        self.iconphoto(True, self.icon)
         self.logo_photo = Image.open('../Photos/SAL_Logo.png')
         self.logo = ImageTk.PhotoImage(self.logo_photo)
         self.canvas.create_image(350, 75, image=self.logo, anchor=NW)
@@ -88,7 +88,7 @@ class MainWindow(tkinter.Tk):  # create a window
         self.EntPass.delete(0, END)
 
     def on_closing(self):
-        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+        if messagebox.askokcancel("Quit Game", "Do you want to quit?"):
             self.send_msg("exit", self.client_socket)
             self.destroy()
 
@@ -118,7 +118,7 @@ class MainWindow(tkinter.Tk):  # create a window
             print(str_insert)
             self.send_msg(str_insert, self.client_socket)
             data = self.recv_msg(self.client_socket)
-            if data is not None and data != "Err_NotExist":
+            if data is not None and data != "Err_NotExist" and data != "Please send data according to protocol":
                 self.UserData.set("Logged in successfully, Welcome back")
                 self.EntPass.delete(0, END)
                 self.open_menu(data)

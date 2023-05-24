@@ -4,6 +4,7 @@ from tkinter import *
 import tkinter.font as font
 from PIL import ImageTk, Image
 from LobbySC import Lobby
+from SettingsSC import Settings
 
 
 class Menu(tkinter.Toplevel):
@@ -18,9 +19,10 @@ class Menu(tkinter.Toplevel):
         self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
-        # ====================Logo and Icon======================
-        self.icon = PhotoImage(file="../Photos/SAL_icon.png")
-        self.iconphoto(False, self.icon)
+
+        # ====================Logo======================
+        # self.icon = PhotoImage(file="../Photos/SAL_icon.png")
+        # self.iconphoto(False, self.icon)
         self.logo_photo = Image.open("../Photos/SAL_Logo.png")
         self.logo = ImageTk.PhotoImage(self.logo_photo)
         self.canvas.create_image(15, 120, image=self.logo, anchor=NW)
@@ -58,7 +60,9 @@ class Menu(tkinter.Toplevel):
         pass
 
     def open_settings(self):
-        pass
+        window = Settings(self)
+        window.grab_set()
+        self.withdraw()
 
     def open_lobby(self):
         window = Lobby(self)

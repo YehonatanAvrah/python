@@ -24,9 +24,8 @@ class Winning_Screen(tkinter.Toplevel):
         self.get_winner()
 
         # ====================Icon======================
-        self.icon = PhotoImage(file="../Photos/SAL_icon.png")
-        self.iconphoto(False, self.icon)
-        self.logo_photo = Image.open("../Photos/SAL_Logo.png")
+        # self.icon = PhotoImage(file="../Photos/SAL_icon.png")
+        # self.iconphoto(False, self.icon)
 
         self.create_gui()
 

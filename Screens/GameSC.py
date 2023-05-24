@@ -35,9 +35,8 @@ class Game(tkinter.Toplevel):
 
     def create_gui(self):
         # ====================Icon======================
-        self.icon = PhotoImage(file="../Photos/SAL_icon.png")
-        self.iconphoto(False, self.icon)
-        self.logo_photo = Image.open("../Photos/SAL_Logo.png")
+        # self.icon = PhotoImage(file="../Photos/SAL_icon.png")
+        # self.iconphoto(False, self.icon)
 
         # --------Board--------
         self.board = Image.open("../Photos/Game_Board.png")  # Cyber/ProjectSAL/Photos/Game_Board.png

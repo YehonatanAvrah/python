@@ -17,8 +17,8 @@ class Register(tkinter.Toplevel):
         self.format = 'utf-8'
 
         # ====================BG and Icon======================
-        self.icon = PhotoImage(file="../Photos/SAL_icon.png")
-        self.iconphoto(False, self.icon)
+        # self.icon = PhotoImage(file="../Photos/SAL_icon.png")
+        # self.iconphoto(False, self.icon)
         self.img = Image.open('../Photos/Anya2.jpg')
         self.resizable(width=False, height=False)
         self.resize = self.img.resize((1200, 720), Image.Resampling.LANCZOS)

@@ -22,8 +22,8 @@ class Lobby(tkinter.Toplevel):
         self.create_gui()
 
         # ====================Logo and Icon======================
-        self.icon = PhotoImage(file="../Photos/SAL_icon.png")
-        self.iconphoto(False, self.icon)
+        # self.icon = PhotoImage(file="../Photos/SAL_icon.png")
+        # self.iconphoto(False, self.icon)
         self.logo_photo = Image.open("../Photos/SAL_Logo.png")
         self.logo = ImageTk.PhotoImage(self.logo_photo)
         self.canvas.create_image(15, 120, image=self.logo, anchor=NW)
