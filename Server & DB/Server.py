@@ -251,7 +251,7 @@ class Server:
             self.winner = player1.name
         elif player2.name == winner:
             self.winner = player2.name
-        self.historyDb.insert_players(player1, player2, self.winner)
+        self.historyDb.insert_players(player1.name, player2.name, self.winner)
         self.userDb.update_wins(self.winner)
 
     def get_winner(self, username):

@@ -19,6 +19,7 @@ class Game(tkinter.Toplevel):
         self.canvas = Canvas(self, width=1800, height=1010, bg='#AC94F4')
         self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
+        self.bind("<Unmap>", self.minimize_window)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
         self.Username = str(self.parent.Username)
         self.opponent_name = self.get_opp_name()
@@ -292,10 +293,13 @@ class Game(tkinter.Toplevel):
         self.withdraw()
 
     def handle_winner(self):
-        arr = ["WinnerExist", self.current_player]
-        str_insert = ",".join(arr)
-        print(str_insert)
-        self.main_parent.send_msg(str_insert, self.main_parent.client_socket)
+        if self.Username == self.current_player:
+            arr = ["WinnerExist", self.current_player]
+            str_insert = ",".join(arr)
+            print(str_insert)
+            self.main_parent.send_msg(str_insert, self.main_parent.client_socket)
         self.open_win_screen()
 
+    def minimize_window(self, event):
+        self.iconify()
 

@@ -21,6 +21,8 @@ class MainWindow(tkinter.Tk):  # create a window
         self.canvas = Canvas(width=1000, height=500, bg='#AC94F4')
         self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
+        self.bind("<Unmap>", self.minimize_window)
+
         # self.Frame = Frame(self, bg='#80c1ff')
         # self.Frame.place(relx=0.5, rely=0.1, relwidth=0.75, relheight=0.1, anchor='n')
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
@@ -94,6 +96,9 @@ class MainWindow(tkinter.Tk):  # create a window
 
     def email_enter(self, event):
         self.EntEmail.delete(0, END)
+
+    def minimize_window(self, event):
+        self.iconify()
 
     def email_leave(self, event):
         current_mail = self.EntEmail.get()

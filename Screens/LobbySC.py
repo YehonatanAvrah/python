@@ -17,6 +17,7 @@ class Lobby(tkinter.Toplevel):
         self.canvas = Canvas(self, width=750, height=600, bg='#AC94F4')
         self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
+        self.bind("<Unmap>", self.minimize_window)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
         self.Username = str(parent.Username)  # self.parent.UserData.get()
         self.create_gui()
@@ -97,4 +98,6 @@ class Lobby(tkinter.Toplevel):
         TimerLbl.set(f"Waiting in queue {counter}")
         self.open_game()
 
+    def minimize_window(self, event):
+        self.iconify()
 

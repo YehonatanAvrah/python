@@ -16,6 +16,7 @@ class GameHistory(tkinter.Toplevel):
         self.canvas = Canvas(self, width=750, height=600, bg='#AC94F4')
         self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
+        self.bind("<Unmap>", self.minimize_window)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
 
         # ====================Icon======================
@@ -25,4 +26,5 @@ class GameHistory(tkinter.Toplevel):
     def create_gui(self):
         self.canvas.create_text(375, 80, text=f"Games History", fill="black", font=self.LblFont)
 
-
+    def minimize_window(self, event):
+        self.iconify()

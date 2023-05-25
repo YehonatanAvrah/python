@@ -1,10 +1,7 @@
 import tkinter
 from tkinter import *
 import tkinter.font as font
-from PIL import Image
-from LoginSC import MainWindow
 from tkinter import messagebox
-from MenuSC import Menu
 
 
 class Settings(tkinter.Toplevel):
@@ -13,13 +10,14 @@ class Settings(tkinter.Toplevel):
         self.client_handler = None
         self.parent = parent  # menu
         self.main_parent = parent.parent  # login
-        self.protocol("WM_DELETE_WINDOW", self.on_closing)
+        # self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.geometry("950x850")
         self.title('Settings')
         self.format = 'utf-8'
         self.canvas = Canvas(self, width=950, height=850, bg='#bbbbbb')
         self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
+        self.bind("<Unmap>", self.minimize_window)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
         self.LblFontUnder = font.Font(family='Comic Sans MS', weight="bold", size=15, underline=True)
 
@@ -72,5 +70,8 @@ class Settings(tkinter.Toplevel):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
             self.main_parent.send_msg("exit", self.main_parent.client_socket)
             self.destroy()
+
+    def minimize_window(self, event):
+        self.iconify()
 
 

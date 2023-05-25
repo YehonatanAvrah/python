@@ -142,7 +142,8 @@ class Users:
             print("Opened database successfully")  # check if worked
             cur_wins = self.get_all_wins(username)
             new_wins = cur_wins + 1
-            str_update = f"update {self.__tablename} set {self.__wins} = '{new_wins}'"
+            str_update = f"update {self.__tablename} set {self.__wins} = '{new_wins}' where " \
+                         f"{self.__username} = '{username}'"
             print(str_update)
             conn.execute(str_update)
             conn.commit()

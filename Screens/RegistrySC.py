@@ -15,12 +15,13 @@ class Register(tkinter.Toplevel):
         self.geometry("1200x720")
         self.title('Registration')
         self.format = 'utf-8'
+        self.resizable(width=False, height=False)
+        self.bind("<Unmap>", self.minimize_window)
 
         # ====================BG and Icon======================
         # self.icon = PhotoImage(file="../Photos/SAL_icon.png")
         # self.iconphoto(False, self.icon)
         self.img = Image.open('../Photos/Anya2.jpg')
-        self.resizable(width=False, height=False)
         self.resize = self.img.resize((1200, 720), Image.Resampling.LANCZOS)
         self.bg = ImageTk.PhotoImage(self.resize)
         self.imgLabel = Label(self, image=self.bg)
@@ -97,5 +98,8 @@ class Register(tkinter.Toplevel):
     def close(self):
         self.parent.deiconify()  # show parent
         self.destroy()  # close and destroy this screen
+
+    def minimize_window(self, event):
+        self.iconify()
 
 
