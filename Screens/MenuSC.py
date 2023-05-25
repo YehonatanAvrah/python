@@ -18,7 +18,6 @@ class Menu(tkinter.Toplevel):
         self.canvas = Canvas(self, width=750, height=600, bg='#AC94F4')
         self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
-        self.bind("<Unmap>", self.minimize_window)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
 
         # ====================Logo======================
@@ -69,9 +68,6 @@ class Menu(tkinter.Toplevel):
         window = Lobby(self)
         window.grab_set()
         self.withdraw()
-
-    def minimize_window(self, event):
-        self.iconify()
 
     # def close(self):
     #     self.parent.deiconify()  # show parent

@@ -8,6 +8,8 @@ from tkinter import messagebox
 from tkinter.messagebox import showerror
 from RegistrySC import Register
 from MenuSC import Menu
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_OAEP
 
 SIZE = 8
 
@@ -21,12 +23,9 @@ class MainWindow(tkinter.Tk):  # create a window
         self.canvas = Canvas(width=1000, height=500, bg='#AC94F4')
         self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
-        self.bind("<Unmap>", self.minimize_window)
-
-        # self.Frame = Frame(self, bg='#80c1ff')
-        # self.Frame.place(relx=0.5, rely=0.1, relwidth=0.75, relheight=0.1, anchor='n')
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.public_key = None
         self.handle_thread_socket()
         self.format = 'utf-8'
 
@@ -97,9 +96,6 @@ class MainWindow(tkinter.Tk):  # create a window
     def email_enter(self, event):
         self.EntEmail.delete(0, END)
 
-    def minimize_window(self, event):
-        self.iconify()
-
     def email_leave(self, event):
         current_mail = self.EntEmail.get()
         if current_mail == '':
@@ -121,7 +117,7 @@ class MainWindow(tkinter.Tk):  # create a window
             arr = ["login", self.Email.get(), self.Password.get()]
             str_insert = ",".join(arr)
             print(str_insert)
-            self.send_msg(str_insert, self.client_socket)
+            self.send_msg(str_insert, self.client_socket, "encrypted")
             data = self.recv_msg(self.client_socket)
             if data is not None and data != "Err_NotExist" and data != "Please send data according to protocol":
                 self.UserData.set("Logged in successfully, Welcome back")
@@ -155,23 +151,30 @@ class MainWindow(tkinter.Tk):  # create a window
 
     def create_socket(self):
         self.client_socket.connect(('127.0.0.1', 1956))
-        data = self.recv_msg(self.client_socket)
+        self.public_key = self.recv_msg(self.client_socket)
         # data = self.client_socket.recv(1024).decode()
-        print("Data is " + data)
+        print("Data is " + self.public_key)
         print("Hello ", self.client_socket)
 
-    def send_msg(self, data, client_socket):
+    def send_msg(self, data, client_socket, msg_type="normal"):
         try:
             print("The message is: " + str(data))
-            length = str(len(data)).zfill(SIZE)
-            length = length.encode(self.format)
-            print(length)
             if type(data) != bytes:
                 data = data.encode()
-            print(data)
-            msg = length + data
-            print("message with length is " + str(msg))
-            client_socket.send(msg)
+
+            if msg_type == "encrypted":
+                encrypted_data = self.encrypt(data)
+                msg = b"encrypted" + encrypted_data
+            else:
+                msg = data
+
+            length = str(len(msg)).zfill(SIZE)
+            length = length.encode(self.format)
+            print(length)
+
+            msg_with_length = length + msg
+            print("Message with length is: " + str(msg_with_length))
+            client_socket.send(msg_with_length)
         except:
             print("Error with sending msg")
 
@@ -198,6 +201,12 @@ class MainWindow(tkinter.Tk):  # create a window
             return data
         except:
             print("Error with receiving msg")
+
+    def encrypt(self, data):
+        public_key = RSA.import_key(self.public_key)
+        cipher = PKCS1_OAEP.new(public_key)
+        encrypted_data = cipher.encrypt(data)
+        return encrypted_data
 
 
 if __name__ == "__main__":

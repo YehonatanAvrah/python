@@ -16,7 +16,6 @@ class Register(tkinter.Toplevel):
         self.title('Registration')
         self.format = 'utf-8'
         self.resizable(width=False, height=False)
-        self.bind("<Unmap>", self.minimize_window)
 
         # ====================BG and Icon======================
         # self.icon = PhotoImage(file="../Photos/SAL_icon.png")
@@ -85,7 +84,7 @@ class Register(tkinter.Toplevel):
                self.Password.get()]
         str_insert = ",".join(arr)
         print(str_insert)
-        self.parent.send_msg(str_insert, self.parent.client_socket)
+        self.parent.send_msg(str_insert, self.parent.client_socket, "encrypted")
         data = self.parent.recv_msg(self.parent.client_socket)
         self.SucReg.set(data)
         self.EntEmail.delete(0, END)
@@ -98,8 +97,3 @@ class Register(tkinter.Toplevel):
     def close(self):
         self.parent.deiconify()  # show parent
         self.destroy()  # close and destroy this screen
-
-    def minimize_window(self, event):
-        self.iconify()
-
-

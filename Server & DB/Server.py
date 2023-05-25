@@ -3,6 +3,8 @@ import threading
 from UsersDB import *
 from GameHistoryDB import *
 from Player import *
+from Crypto.Cipher import PKCS1_OAEP
+from Crypto.PublicKey import RSA
 
 SIZE = 8
 
@@ -16,6 +18,11 @@ class Server:
         self.running = True
         self.format = 'utf-8'
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Create a socket
+
+        self.key = RSA.generate(2048)  # Generate RSA key pair
+        self.private_key = self.key.export_key()  # private key
+        self.public_key = self.key.publickey().export_key()  # public key
+
         self.userDb = Users()
         self.historyDb = GameHistory()
         self.players = []
@@ -35,35 +42,56 @@ class Server:
                 client_socket, address = server_socket.accept()  # creating connection with client
                 self.conn_handler(client_socket)
                 print("New client connected")
-                self.send_msg("Connection with server successfully established", client_socket)
+                # self.send_msg("Connection with server successfully established", client_socket)
+                self.send_msg(self.public_key, client_socket)
                 self.count += 1
                 print(f"current amount of clients: {self.count}")
 
         except socket.error as e:
             print(e)
 
-    def send_msg(self, data, client_socket):
+    def encrypt(self, data):
+        public_key = RSA.import_key(self.public_key)
+        cipher = PKCS1_OAEP.new(public_key)
+        encrypted_data = cipher.encrypt(data)
+        return encrypted_data
+
+    def decrypt(self, encrypted_data):
+        private_key = RSA.import_key(self.private_key)
+        cipher = PKCS1_OAEP.new(private_key)
+        decrypted_data = cipher.decrypt(encrypted_data)
+        return decrypted_data
+
+    def send_msg(self, data, client_socket, msg_type="normal"):
         try:
             print("The message is: " + str(data))
-            length = str(len(data)).zfill(SIZE)
-            length = length.encode(self.format)
-            print(length)
             if type(data) != bytes:
                 data = data.encode()
-            print(data)
-            msg = length + data
-            print("message with length is " + str(msg))
-            client_socket.send(msg)
+
+            if msg_type == "encrypted":
+                encrypted_data = self.encrypt(data)
+                msg = b"encrypted" + encrypted_data
+            else:
+                msg = data
+
+            length = str(len(msg)).zfill(SIZE)
+            length = length.encode(self.format)
+            print(length)
+
+            msg_with_length = length + msg
+            print("Message with length is: " + str(msg_with_length))
+            client_socket.send(msg_with_length)
         except:
             print("Error with sending msg")
 
-    def recv_msg(self, client_socket, ret_type="string"):  # ret_type is string by default unless stated otherwise
+    def recv_msg(self, client_socket, ret_type="string"):
         try:
             length = client_socket.recv(SIZE).decode(self.format)
             if not length:
                 print("NO LENGTH!")
                 return None
             print("The length is " + length)
+
             data = b""
             remaining = int(length)
             while remaining > 0:
@@ -74,10 +102,16 @@ class Server:
                 data += chunk
                 remaining -= len(chunk)
             print("The data is: " + str(data))
-            if ret_type == "string":
-                data = data.decode(self.format)
-            print(data)
-            return data
+
+            if data.startswith(b"encrypted"):
+                encrypted_data = data[len(b"encrypted"):]
+                decrypted_data = self.decrypt(encrypted_data)
+                return decrypted_data.decode(self.format)
+            else:
+                if ret_type == "string":
+                    return data.decode(self.format)
+
+            # return data
         except:
             print("Error with receiving msg")
 
@@ -90,7 +124,7 @@ class Server:
         print(running)
         while running:
             try:
-                print("---------------------------------")
+                print("---------------------------------\n")
                 server_data = self.recv_msg(client_socket)
                 if server_data is None:
                     break

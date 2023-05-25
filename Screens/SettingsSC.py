@@ -17,7 +17,6 @@ class Settings(tkinter.Toplevel):
         self.canvas = Canvas(self, width=950, height=850, bg='#bbbbbb')
         self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
-        self.bind("<Unmap>", self.minimize_window)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
         self.LblFontUnder = font.Font(family='Comic Sans MS', weight="bold", size=15, underline=True)
 
@@ -70,8 +69,3 @@ class Settings(tkinter.Toplevel):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
             self.main_parent.send_msg("exit", self.main_parent.client_socket)
             self.destroy()
-
-    def minimize_window(self, event):
-        self.iconify()
-
-

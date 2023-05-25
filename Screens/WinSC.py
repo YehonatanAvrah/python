@@ -16,7 +16,6 @@ class Winning_Screen(tkinter.Toplevel):
         self.canvas = Canvas(self, width=750, height=600, bg='#AC94F4')
         self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
-        self.bind("<Unmap>", self.minimize_window)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
         self.Username = self.parent.Username
         self.opponent_name = self.parent.opponent_name
@@ -53,9 +52,3 @@ class Winning_Screen(tkinter.Toplevel):
                 self.loser = self.Username
         except:
             print("FAIL- set winner")
-
-    def minimize_window(self, event):
-        self.iconify()
-
-
-
