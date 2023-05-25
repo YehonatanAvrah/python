@@ -19,6 +19,7 @@ class Server:
         self.userDb = Users()
         self.historyDb = GameHistory()
         self.players = []
+        self.winner = None
         self.winners = []
 
     def start_server(self):
@@ -245,7 +246,7 @@ class Server:
     def set_winner(self, winner):
         player1 = self.players[0]
         player2 = self.players[1]
-        self.winner = None
+        #self.winner = None
         print(f"players: {player1.name, player2.name}, winner: {winner}")
         if player1.name == winner:
             self.winner = player1.name
