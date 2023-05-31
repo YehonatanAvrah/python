@@ -10,6 +10,7 @@ from RegistrySC import Register
 from MenuSC import Menu
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
+import pickle
 
 SIZE = 8
 
@@ -47,7 +48,7 @@ class MainWindow(tkinter.Tk):  # create a window
         self.EmailLbl = Label(self, text="Email: ", width=10, font=self.LblFont, bg='#AC94F4')  # place a label on the window
         self.EmailLbl.place(x=100, y=25)
         self.EntEmail = Entry(self, textvariable=self.Email, border=0, font=self.LblFont)
-        self.EntEmail.place(x=225, y=25)  # x=100, y=25
+        self.EntEmail.place(x=210, y=25)  # x=100, y=25
         # self.EntEmail.insert(0, "Email")
         # self.EntEmail.bind('<FocusIn>', self.email_enter)
         # self.EntEmail.bind('<FocusOut>', self.email_leave)
@@ -150,11 +151,12 @@ class MainWindow(tkinter.Tk):  # create a window
         client_handler.start()
 
     def create_socket(self):
-        self.client_socket.connect(('127.0.0.1', 1956))
-        self.public_key = self.recv_msg(self.client_socket)
+        self.client_socket.connect(('127.0.0.1', 1956))  # first step: SYN
+        self.public_key = self.recv_msg(self.client_socket)  # Second step: SYN-ACK
         # data = self.client_socket.recv(1024).decode()
         print("Data is " + self.public_key)
-        print("Hello ", self.client_socket)
+        self.send_msg("Hello! This is Client", self.client_socket, "encrypted")  # Third step: ACK, checking encryption
+        # print("Hello ", self.client_socket)
 
     def send_msg(self, data, client_socket, msg_type="normal"):
         try:
@@ -184,7 +186,7 @@ class MainWindow(tkinter.Tk):  # create a window
             if not length:
                 print("NO LENGTH!")
                 return None
-            print("The length is " + length)  # error: The length is 00000007The length is Bondman
+            print("The length is " + length)
             data = b""
             remaining = int(length)
             while remaining > 0:
@@ -197,16 +199,22 @@ class MainWindow(tkinter.Tk):  # create a window
             print("The data is: " + str(data))
             if ret_type == "string":
                 data = data.decode(self.format)
+            elif ret_type == "list":
+                data = pickle.loads(data)
             print(data)
             return data
         except:
             print("Error with receiving msg")
 
     def encrypt(self, data):
-        public_key = RSA.import_key(self.public_key)
-        cipher = PKCS1_OAEP.new(public_key)
-        encrypted_data = cipher.encrypt(data)
-        return encrypted_data
+        try:
+            public_key = RSA.import_key(self.public_key)
+            cipher = PKCS1_OAEP.new(public_key)
+            encrypted_data = cipher.encrypt(data)
+            return encrypted_data
+        except:
+            print("fail - encryption")
+            return False
 
 
 if __name__ == "__main__":

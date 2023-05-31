@@ -5,6 +5,7 @@ import tkinter.font as font
 from PIL import ImageTk, Image
 from LobbySC import Lobby
 from SettingsSC import Settings
+from GameHistorySC import GameHistory
 
 
 class Menu(tkinter.Toplevel):
@@ -57,7 +58,9 @@ class Menu(tkinter.Toplevel):
         # self.btn_close.place(x=625, y=80)
 
     def open_history(self):
-        pass
+        window = GameHistory(self)
+        window.grab_set()
+        self.withdraw()
 
     def open_settings(self):
         window = Settings(self)

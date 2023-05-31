@@ -51,14 +51,12 @@ class Users:
     def ret_user_by_email_and_pswrd(self, email, password):
         try:
             conn = sqlite3.connect('Users.db')
-            print("Opened database successfully") # check if worked
+            print("Opened database successfully")  # check if worked
             salt = 'AnyaWakuWakuSecret'  # secret key
             salt_pswrd = hashlib.md5(salt.encode('utf-8') + password.encode('utf-8')).hexdigest()
-            strsql = f"SELECT * from {self.__tablename} where {self.__email} = '{str(email)}' AND " \
-                     f"{self.__password} = '{str(salt_pswrd)}'"
-            print(strsql)
-            cursor = conn.execute(strsql)
-            print(cursor)
+            strsql = f"SELECT * from {self.__tablename} where {self.__email} = ? AND {self.__password} = ?"
+            params = (str(email), str(salt_pswrd))
+            cursor = conn.execute(strsql, params)
             row = cursor.fetchone()
             user_data = str([row[1], row[2], row[3], row[4], row[5], row[6]])
             print("User data: " + str(user_data))
@@ -69,17 +67,25 @@ class Users:
             print("Failed to find user")
             return False
 
-    def update_user(self, recv_userid, new_email, new_username, new_password):
+    def update_user(self, recv_userid, new_email=None, new_username=None, new_password=None):
         try:
             conn = sqlite3.connect('Users.db')
             print("Opened database successfully")  # check if worked
+
+            if new_email is None:
+                new_email = self.__email
+            if new_username is None:
+                new_username = self.__username
+            if new_password is None:
+                new_password = self.__password
+
             str_update = f"update {self.__tablename} set {self.__email} = '{new_email}', {self.__username} = " \
                          f"'{new_username}', {self.__password} = '{new_password}' where {self.__user_id} = {recv_userid}"
             print(str_update)
             conn.execute(str_update)
             conn.commit()
             conn.close()
-            print("The users info was successfully updated")
+            print("The user's info was successfully updated")
             return "Success"
         except:
             return "Failed to update user"
@@ -116,11 +122,11 @@ class Users:
         except:
             return False
 
-    def get_all_wins(self, cur_username):
+    def get_all_wins(self, username):
         try:
             conn = sqlite3.connect('Users.db')
             print("Opened database successfully")  # check if worked
-            str1 = f"select*from {self.__tablename} where {self.__username} = '{cur_username}'"
+            str1 = f"select*from {self.__tablename} where {self.__username} = '{username}'"
             print(str1)
             cursor = conn.execute(str1)
             print(cursor)
@@ -141,7 +147,8 @@ class Users:
             conn = sqlite3.connect('Users.db')
             print("Opened database successfully")  # check if worked
             cur_wins = self.get_all_wins(username)
-            new_wins = cur_wins + 1
+            new_wins = int(cur_wins) + 1
+            print(new_wins)
             str_update = f"update {self.__tablename} set {self.__wins} = '{new_wins}' where " \
                          f"{self.__username} = '{username}'"
             print(str_update)
@@ -164,3 +171,4 @@ class Users:
 # u.update_user(3, "NewDori@gmail.com", "NewDoriking", "12345")
 # u.delete_user_by_id(4)
 # u.get_all_users()
+# u.update_wins("RoHakim9")

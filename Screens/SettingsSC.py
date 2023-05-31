@@ -53,7 +53,7 @@ class Settings(tkinter.Toplevel):
         self.btn_logout = Button(self.canvas, text="Logout", command=self.open_login, background="red",
                                    font=self.LblFont)
         self.btn_logout.place(x=55, y=20)
-        self.btn_close = Button(self.canvas, text="Close", command=self.open_menu, background="#d4af37",
+        self.btn_close = Button(self.canvas, text="Previous Window", command=self.open_menu, background="#d4af37",
                                  font=self.LblFont)
         self.btn_close.place(x=155, y=20)
 

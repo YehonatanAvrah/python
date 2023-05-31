@@ -5,6 +5,7 @@ from GameHistoryDB import *
 from Player import *
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
+import pickle
 
 SIZE = 8
 
@@ -17,7 +18,7 @@ class Server:
         self.count = 0
         self.running = True
         self.format = 'utf-8'
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Create a socket
+        self.server_socket = None
 
         self.key = RSA.generate(2048)  # Generate RSA key pair
         self.private_key = self.key.export_key()  # private key
@@ -32,45 +33,59 @@ class Server:
     def start_server(self):
         try:
             print('[STARTING SERVER...]')
-            server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create socket
-            server_socket.bind(self.addr)  # bind to port number
-            server_socket.listen(1)  # server listens to X client at a time
+            self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create socket
+            self.server_socket.bind(self.addr)  # bind to port number
+            self.server_socket.listen(1)  # server listens to X client at a time
             print(f"[LISTENING...] Server is listening on {self.addr}")
 
             while True:
+                # Perform three-way handshake
                 print("Waiting for a client")
-                client_socket, address = server_socket.accept()  # creating connection with client
-                self.conn_handler(client_socket)
+                client_socket, address = self.server_socket.accept()  # create connection with client, first step: SYN
                 print("New client connected")
                 # self.send_msg("Connection with server successfully established", client_socket)
-                self.send_msg(self.public_key, client_socket)
+                self.send_msg(self.public_key, client_socket)  # Second step: SYN-ACK
+                self.recv_msg(client_socket)  # Third step: ACK
+                self.conn_handler(client_socket)
                 self.count += 1
                 print(f"current amount of clients: {self.count}")
 
         except socket.error as e:
-            print(e)
+            print(f"Socket error occurred: {e}")
 
     def encrypt(self, data):
-        public_key = RSA.import_key(self.public_key)
-        cipher = PKCS1_OAEP.new(public_key)
-        encrypted_data = cipher.encrypt(data)
-        return encrypted_data
+        try:
+            public_key = RSA.import_key(self.public_key)
+            cipher = PKCS1_OAEP.new(public_key)
+            encrypted_data = cipher.encrypt(data)
+            return encrypted_data
+        except:
+            print("fail - encryption")
+            return False
 
     def decrypt(self, encrypted_data):
-        private_key = RSA.import_key(self.private_key)
-        cipher = PKCS1_OAEP.new(private_key)
-        decrypted_data = cipher.decrypt(encrypted_data)
-        return decrypted_data
+        try:
+            private_key = RSA.import_key(self.private_key)
+            cipher = PKCS1_OAEP.new(private_key)
+            decrypted_data = cipher.decrypt(encrypted_data)
+            return decrypted_data
+        except:
+            print("fail - decryption")
+            return False
 
     def send_msg(self, data, client_socket, msg_type="normal"):
         try:
             print("The message is: " + str(data))
-            if type(data) != bytes:
+            if type(data) != bytes and type(data) != list:
                 data = data.encode()
 
             if msg_type == "encrypted":
                 encrypted_data = self.encrypt(data)
                 msg = b"encrypted" + encrypted_data
+            elif msg_type == "list":
+                print(type(data))
+                msg = pickle.dumps(data)
+                print(msg)
             else:
                 msg = data
 
@@ -110,10 +125,11 @@ class Server:
             else:
                 if ret_type == "string":
                     return data.decode(self.format)
-
-            # return data
+                else:
+                    return data
         except:
             print("Error with receiving msg")
+            return False
 
     def conn_handler(self, client_socket):
         client_handler = threading.Thread(target=self.handle_client, args=(client_socket,))
@@ -126,7 +142,7 @@ class Server:
             try:
                 print("---------------------------------\n")
                 server_data = self.recv_msg(client_socket)
-                if server_data is None:
+                if server_data is None or type(server_data) is bool:
                     break
                 print(server_data)
                 arr = server_data.split(",")
@@ -139,7 +155,7 @@ class Server:
                     print(arr)
                     server_data = self.userDb.insert_user(arr[1], arr[2], arr[3], arr[4], arr[5])
                     print("server data:", server_data)
-                    if server_data == "Email exists":
+                    if server_data == "Email exists":  # needs to add or server_data == "username_exists"
                         self.send_msg("Email already exists", client_socket)
                     if server_data:
                         self.send_msg("Successfully registered!", client_socket)
@@ -185,6 +201,15 @@ class Server:
                     print(arr[1] + " is requesting for the winner's name")
                     self.get_winner(arr[1])  # arr[1] = username
 
+                elif arr and cmd == "Games_History" and len(arr) == 1:
+                    server_data = self.historyDb.get_history()
+                    print("Server data: ", server_data)
+                    #str_data = '-'.join([','.join(map(str, item)) for item in server_data])
+                    #print(str_data)
+                    #client_socket.send(str_data.encode())
+                    self.send_msg(server_data, client_socket, "list")
+
+
                 elif arr and cmd == "exit" and len(arr) == 1:
                     print("exit")
                     running = False  # change the variable to exit the loop
@@ -194,7 +219,7 @@ class Server:
 
                 else:  # if the data from the client is false according to the protocol
                     server_data = "Please send data according to protocol"
-                    self.send_msg(server_data, client_socket)
+                    self.send_msg(server_data, client_socket)  # General Error
                 # print("server sends>>> " + server_data)
 
             except socket.error as e:
@@ -286,20 +311,26 @@ class Server:
             self.winner = player1.name
         elif player2.name == winner:
             self.winner = player2.name
-        self.historyDb.insert_players(player1.name, player2.name, self.winner)
+        self.historyDb.insert_game(player1.name, player2.name, self.winner)
         self.userDb.update_wins(self.winner)
 
     def get_winner(self, username):
-        player1 = self.players[0]
-        player2 = self.players[1]
-        if player1.name == username:
-            self.send_msg(self.winner, player1.client_socket)
-        elif player2.name == username:
-            self.send_msg(self.winner, player2.client_socket)
+        try:
+            player1 = self.players[0]
+            player2 = self.players[1]
+            print("0")
+            if player1.name == username:
+                self.send_msg(self.winner, player1.client_socket)
+                print("1")
+            elif player2.name == username:
+                self.send_msg(self.winner, player2.client_socket)
+                print("2")
+        except:
+            print("fail - get winner")
 
 
 if __name__ == '__main__':
-    ip = '127.0.0.1'  # 127.0.0.1 means that it's this pc
+    ip = '0.0.0.0'  # 127.0.0.1 means that it's this pc
     port = 1956
     S = Server(ip, port)
     S.start_server()

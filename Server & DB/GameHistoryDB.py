@@ -20,7 +20,7 @@ class GameHistory:
         conn.commit()
         conn.close()
 
-    def insert_players(self, player1, player2, winner):
+    def insert_game(self, player1, player2, winner):
         try:
             conn = sqlite3.connect('GameHistory.db')
             print("Opened database successfully")  # check if worked
@@ -35,4 +35,28 @@ class GameHistory:
         except:
             print("Failed to insert game")
             return False
+
+    def get_history(self):
+        try:
+            conn = sqlite3.connect('GameHistory.db')
+            print("Opened database successfully")  # check if worked
+            str1 = "select*from " + self.__tablename
+            print(str1)
+            cursor = conn.execute(str1)
+            rows = cursor.fetchall()
+            arr_games = []
+            for row in rows:
+                str_rows = str(row[0]) + " " + row[1] + " " + row[2] + " " + row[3]
+                arr_games.append(str_rows)
+            print(arr_games)
+            return arr_games
+        except:
+            print("failed - get games")
+            return False
+
+# H = GameHistory()
+# print(H.get_history())
+
+
+
 

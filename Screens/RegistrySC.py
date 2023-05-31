@@ -86,12 +86,13 @@ class Register(tkinter.Toplevel):
         print(str_insert)
         self.parent.send_msg(str_insert, self.parent.client_socket, "encrypted")
         data = self.parent.recv_msg(self.parent.client_socket)
-        self.SucReg.set(data)
-        self.EntEmail.delete(0, END)
-        self.EntPass.delete(0, END)
-        self.EntFName.delete(0, END)
-        self.EntLName.delete(0, END)
-        self.EntUsername.delete(0, END)
+        if data == "Successfully registered!":
+            self.SucReg.set(data)
+            self.EntEmail.delete(0, END)
+            self.EntPass.delete(0, END)
+            self.EntFName.delete(0, END)
+            self.EntLName.delete(0, END)
+            self.EntUsername.delete(0, END)
         print(data)
 
     def close(self):

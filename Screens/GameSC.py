@@ -4,7 +4,7 @@ from tkinter import *
 import threading
 import tkinter.font as font
 from PIL import ImageTk, Image
-from WinSC import Winning_Screen
+from GameOverSC import Winning_Screen
 
 
 class Game(tkinter.Toplevel):
@@ -162,12 +162,13 @@ class Game(tkinter.Toplevel):
         client_handler.daemon = True
         client_handler.start()
 
-    def recv_dice_result(self):  # fail here
+    def recv_dice_result(self):
         try:
             while self.running:
-                state = self.btn_roll.cget("state")
+                # state = self.btn_roll.cget("state")
                 # print("Button state:", state)
-                if state == "disabled":
+                #if state == "disabled":
+                if self.current_player == self.opponent_name:
                     data = self.main_parent.recv_msg(self.main_parent.client_socket)
                     print("Received data:", data)
                     data = data.split(",")
@@ -181,7 +182,7 @@ class Game(tkinter.Toplevel):
                     else:
                         print("Invalid data received:", data)
                 else:
-                    # print("Receive operation skipped when the button is active")
+                    # print("Receive operation skipped when it’s your turn")
                     pass
         except:
             print("failed in recv_dice_res")
@@ -215,9 +216,9 @@ class Game(tkinter.Toplevel):
         col = 90  # y
         i = 0
         self.square_index = {}  # to store x and y of every square
-        for x in range(1, 11):
+        for x in range(1, 11):  # rows
             row = 160  # x
-            for y in range(1, 11):
+            for y in range(1, 11):  # columns
                 self.square_index[self.squares[i]] = (row, col)
                 row = row + 100
                 i = i + 1
@@ -241,7 +242,7 @@ class Game(tkinter.Toplevel):
                     self.turn_lbl.config(text="Your turn!")
             else:
                 self.running = False
-                self.handle_winner()
+                self.after(350, self.handle_winner)
             #self.after(100, self.player_turn)
         elif self.current_player == self.player_id2:
             self.player_pos2 = self.player_pos2 + dice_result  # calculate the new position of the player2
@@ -258,7 +259,8 @@ class Game(tkinter.Toplevel):
                     self.turn_lbl.config(text="Your turn!")
             else:
                 self.running = False
-                self.handle_winner()
+                self.after(350, self.handle_winner)
+
 
             #self.after(100, self.player_turn)
 
@@ -297,4 +299,6 @@ class Game(tkinter.Toplevel):
             str_insert = ",".join(arr)
             print(str_insert)
             self.main_parent.send_msg(str_insert, self.main_parent.client_socket)
-        self.open_win_screen()
+            self.open_win_screen()
+        else:
+            self.after(350, self.open_win_screen)
