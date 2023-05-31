@@ -30,6 +30,9 @@ class Winning_Screen(tkinter.Toplevel):
         print(self.Username)
         self.canvas.create_text(400, 120, text=f"WINNER: {self.winner}", fill="black", font=self.LblFont)
         self.canvas.create_text(400, 180, text=f"LOSER: {self.loser}", fill="black", font=self.LblFont)
+        self.btn_close = Button(self.canvas, text="Back To Menu", command=self.open_menu, background="#d4af37",
+                                font=self.LblFont)
+        self.btn_close.place(x=155, y=250)
 
     def set_winner(self):
         try:
@@ -48,3 +51,7 @@ class Winning_Screen(tkinter.Toplevel):
                 self.loser = self.Username
         except:
             print("FAIL- set winner")
+
+    def open_menu(self):
+        self.parent.parent.parent.deiconify()  # show menu
+        self.destroy()  # close and destroy this screen

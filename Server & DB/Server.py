@@ -204,9 +204,6 @@ class Server:
                 elif arr and cmd == "Games_History" and len(arr) == 1:
                     server_data = self.historyDb.get_history()
                     print("Server data: ", server_data)
-                    #str_data = '-'.join([','.join(map(str, item)) for item in server_data])
-                    #print(str_data)
-                    #client_socket.send(str_data.encode())
                     self.send_msg(server_data, client_socket, "list")
 
 
