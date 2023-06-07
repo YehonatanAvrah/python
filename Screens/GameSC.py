@@ -25,6 +25,7 @@ class Game(tkinter.Toplevel):
         self.player_id1 = None
         self.player_id2 = None
         self.current_player = None
+        self.winner = None
         self.set_player_id()
         self.create_gui()
         self.get_index()
@@ -164,24 +165,29 @@ class Game(tkinter.Toplevel):
 
     def recv_dice_result(self):
         try:
+            if self.player_pos1 >= 100 or self.player_pos2 >= 100:
+                self.running = False
             while self.running:
+                if self.player_pos1 >= 100 or self.player_pos2 >= 100:
+                    break
                 # state = self.btn_roll.cget("state")
                 # print("Button state:", state)
-                #if state == "disabled":
+                # if state == "disabled":
                 if self.current_player == self.opponent_name:
                     print("entered recv res")
-                    data = self.main_parent.recv_msg(self.main_parent.client_socket)
-                    print("Received data:", data)
-                    data = data.split(",")
-                    if data[0] == "ResExist":
-                        print("Opponent's result exists.")
-                        result = int(data[1])
-                        print("Opponent's result:", result)
-                        self.after(100, self.move_pawn, result)
-                        self.after(200, self.btn_roll.configure(state="active"))
+                    if self.running:
+                        data = self.main_parent.recv_msg(self.main_parent.client_socket)
+                        print("Received data:", data)
+                        data = data.split(",")
+                        if data[0] == "ResExist":
+                            print("Opponent's result exists.")
+                            result = int(data[1])
+                            print("Opponent's result:", result)
+                            self.after(100, self.move_pawn, result)
+                            self.after(200, self.btn_roll.configure(state="active"))
                         # self.btn_roll.configure(state="active")
-                    else:
-                        print("Invalid data received:", data)
+                        else:
+                            print("Invalid data received:", data)
                 else:
                     # print("Receive operation skipped when it’s your turn")
                     pass
@@ -231,8 +237,9 @@ class Game(tkinter.Toplevel):
         # print(self.current_player)
         if self.current_player == self.player_id1:
             self.player_pos1 = self.player_pos1 + dice_result  # calculate the new position of the player1
-            if self.player_pos1 > 100:
+            if self.player_pos1 >= 100:
                 self.player_pos1 = 100
+                self.running = False
             self.canvas.coords(self.player_1, self.square_index[self.player_pos1][0],
                                self.square_index[self.player_pos1][1])
             self.after(350, self.check_ladder_or_snake)
@@ -243,13 +250,14 @@ class Game(tkinter.Toplevel):
                 else:
                     self.turn_lbl.config(text="Your turn!")
             else:
-                self.running = False
+                self.winner = self.current_player
                 self.after(350, self.handle_winner)
             #self.after(100, self.player_turn)
         elif self.current_player == self.player_id2:
             self.player_pos2 = self.player_pos2 + dice_result  # calculate the new position of the player2
-            if self.player_pos2 > 100:
+            if self.player_pos2 >= 100:
                 self.player_pos2 = 100
+                self.running = False
             self.canvas.coords(self.player_2, self.square_index[self.player_pos2][0],
                                self.square_index[self.player_pos2][1])
             self.after(350, self.check_ladder_or_snake)
@@ -260,7 +268,7 @@ class Game(tkinter.Toplevel):
                 else:
                     self.turn_lbl.config(text="Your turn!")
             else:
-                self.running = False
+                self.winner = self.current_player
                 self.after(350, self.handle_winner)
 
 
@@ -291,7 +299,7 @@ class Game(tkinter.Toplevel):
                 self.player_pos2 = bottom_of_snake
 
     def open_win_screen(self):
-        window = Winning_Screen(self)
+        window = Winning_Screen(self, self.winner)
         window.grab_set()
         self.withdraw()
 
@@ -301,12 +309,12 @@ class Game(tkinter.Toplevel):
             arr = ["WinnerExist", self.current_player]
             str_insert = ",".join(arr)
             print(str_insert)
-            self.main_parent.send_msg(str_insert, self.main_parent.client_socket)
-            data = self.main_parent.recv_msg(self.main_parent.client_socket)
-            if data == "GameOver":
-                self.open_win_screen()
+            #self.main_parent.send_msg(str_insert, self.main_parent.client_socket)
+            # data = self.main_parent.recv_msg(self.main_parent.client_socket)
+            # if data == "GameOver":
+            self.open_win_screen()
         else:
-            data = self.main_parent.recv_msg(self.main_parent.client_socket)
-            if data == "GameOver":
-                self.open_win_screen()
+            # data = self.main_parent.recv_msg(self.main_parent.client_socket)
+            # if data == "GameOver":
+            self.open_win_screen()
             # self.after(350, self.open_win_screen)

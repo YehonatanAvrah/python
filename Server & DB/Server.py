@@ -310,8 +310,8 @@ class Server:
             self.winner = player1.name
         elif player2.name == winner:
             self.winner = player2.name
-        self.send_msg("GameOver", player1.client_socket)
-        self.send_msg("GameOver", player2.client_socket)
+        # self.send_msg("GameOver", player1.client_socket)
+        # self.send_msg("GameOver", player2.client_socket)
         self.historyDb.insert_game(player1.name, player2.name, self.winner)
         self.userDb.update_wins(self.winner)
 
