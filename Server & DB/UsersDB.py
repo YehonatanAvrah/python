@@ -4,13 +4,11 @@ import hashlib
 
 
 class Users:
-    def __init__(self, tablename="Users", user_id="ID", email="email", firstname="firstname", lastname="lastname",
-                 username="username", password="password", wins='wins'):
+    def __init__(self, tablename="Users", user_id="ID", email="email", username="username", password="password",
+                 wins="wins"):
         self.__tablename = tablename
         self.__user_id = user_id
         self.__email = email
-        self.__firstname = firstname
-        self.__lastname = lastname
         self.__username = username
         self.__password = password
         self.__wins = wins
@@ -19,8 +17,6 @@ class Users:
         print("Opened database successfully")
         str1 = "CREATE TABLE IF NOT EXISTS " + self.__tablename + "(" + self.__user_id + " " + "INTEGER PRIMARY KEY AUTOINCREMENT ,"
         str1 += " " + self.__email + " TEXT    NOT NULL ,"
-        str1 += " " + self.__firstname + " TEXT    NOT NULL ,"
-        str1 += " " + self.__lastname + " TEXT    NOT NULL ,"
         str1 += " " + self.__username + " TEXT    NOT NULL ,"
         str1 += " " + self.__password + " TEXT    NOT NULL ,"
         str1 += " " + self.__wins + " INTEGER    NOT NULL)"
@@ -29,16 +25,23 @@ class Users:
         conn.commit()
         conn.close()
 
-    def insert_user(self, email, firstname, lastname, username, password):
+    def insert_user(self, email, username, password):
         try:
+            exist_status = self.is_exist(email, username)
+            if exist_status == "Email exists":
+                print("Email already exists")
+                return "Email exists"
+            elif exist_status == "Username exists":
+                print("Username already taken")
+                return "Username taken"
+
             conn = sqlite3.connect('Users.db')
             print("Opened database successfully")  # check if worked
             salt = 'AnyaWakuWakuSecret'  # secret key
             salt_pswrd = hashlib.md5(salt.encode('utf-8') + password.encode('utf-8')).hexdigest()
             print(salt_pswrd)
-            str_insert = f"INSERT INTO {self.__tablename} ({self.__email}, {self.__password}, {self.__firstname}," \
-                         f" {self.__lastname}, {self.__username}, {self.__wins}) VALUES (?, ?, ?, ?, ?, ?)"
-            params = (email, salt_pswrd, firstname, lastname, username, 0)
+            str_insert = f"INSERT INTO {self.__tablename} ({self.__email}, {self.__password}, {self.__username}, {self.__wins}) VALUES (?, ?, ?, ?)"
+            params = (email, salt_pswrd, username, 0)
             conn.execute(str_insert, params)
             conn.commit()
             conn.close()
@@ -46,6 +49,25 @@ class Users:
             return True
         except:
             print("Failed to insert user")
+            return False
+
+    def is_exist(self, email, username):
+        try:
+            conn = sqlite3.connect('Users.db')
+            print("Opened database successfully")  # check if worked
+            strsql = f"SELECT * FROM {self.__tablename} WHERE {self.__email} = ? OR {self.__username} = ?"
+            params = (str(email), str(username))
+            cursor = conn.execute(strsql, params)
+            row = cursor.fetchone()
+            conn.close()
+            if row:
+                if row[1] == email:
+                    return "Email exists"
+                elif row[4] == username:
+                    return "Username taken"
+            return False
+        except:
+            print("Failed to check user existence")
             return False
 
     def ret_user_by_email_and_pswrd(self, email, password):
@@ -58,11 +80,11 @@ class Users:
             params = (str(email), str(salt_pswrd))
             cursor = conn.execute(strsql, params)
             row = cursor.fetchone()
-            user_data = str([row[1], row[2], row[3], row[4], row[5], row[6]])
+            user_data = str([row[1], row[2], row[3]])
             print("User data: " + str(user_data))
             conn.commit()
             conn.close()
-            return row[4]
+            return row[2]
         except:
             print("Failed to find user")
             return False
@@ -79,8 +101,7 @@ class Users:
             if new_password is None:
                 new_password = self.__password
 
-            str_update = f"update {self.__tablename} set {self.__email} = '{new_email}', {self.__username} = " \
-                         f"'{new_username}', {self.__password} = '{new_password}' where {self.__user_id} = {recv_userid}"
+            str_update = f"UPDATE {self.__tablename} SET {self.__email} = '{new_email}', {self.__username} = '{new_username}', {self.__password} = '{new_password}' WHERE {self.__user_id} = {recv_userid}"
             print(str_update)
             conn.execute(str_update)
             conn.commit()
@@ -94,7 +115,7 @@ class Users:
         try:
             conn = sqlite3.connect('Users.db')
             print("Opened database successfully")  # check if worked
-            str_delete = f"DELETE from {self.__tablename} where {self.__user_id} = {str(id)}"
+            str_delete = f"DELETE FROM {self.__tablename} WHERE {self.__user_id} = {str(id)}"
             print(str_delete)
             conn.execute(str_delete)
             conn.commit()
@@ -108,14 +129,13 @@ class Users:
         try:
             conn = sqlite3.connect('Users.db')
             print("Opened database successfully")  # check if worked
-            str1 = "select*from " + self.__tablename
+            str1 = "SELECT * FROM " + self.__tablename
             print(str1)
             cursor = conn.execute(str1)
             rows = cursor.fetchall()
             arr_users = []
             for row in rows:
-                str_rows = str(row[0]) + " " + row[1] + " " + row[2] + " " + row[3] + " " + row[4] \
-                           + " " + str(row[5]) + " " + str(row[6])
+                str_rows = str(row[0]) + " " + row[1] + " " + row[2] + " " + str(row[3]) + " " + str(row[4])
                 arr_users.append(str_rows)
             print(arr_users)
             return arr_users
@@ -131,7 +151,7 @@ class Users:
             cursor = conn.execute(str1)
             print(cursor)
             row = cursor.fetchone()
-            user_wins = str(row[6])
+            user_wins = str(row[4])
             print("User wins: " + user_wins)
             conn.commit()
             conn.close()

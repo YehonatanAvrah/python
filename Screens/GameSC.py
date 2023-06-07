@@ -77,13 +77,13 @@ class Game(tkinter.Toplevel):
         self.pawn1_resize = self.pawn1.resize((50, 50), Image.Resampling.LANCZOS)
         self.pawn_red = ImageTk.PhotoImage(self.pawn1_resize)
         self.player_1 = self.canvas.create_image(120, 925, image=self.pawn_red, anchor=S)
-        self.player_pos1 = 0  # set the current position of the player1
+        self.player_pos1 = 90  # set the current position of the player1
 
         self.pawn2 = Image.open("../Photos/blue_pawn.png")
         self.pawn2_resize = self.pawn2.resize((50, 50), Image.Resampling.LANCZOS)
         self.pawn_blue = ImageTk.PhotoImage(self.pawn2_resize)
         self.player_2 = self.canvas.create_image(180, 925, image=self.pawn_blue, anchor=S)
-        self.player_pos2 = 0  # set the current position of the player2
+        self.player_pos2 = 90  # set the current position of the player2
 
     def get_opp_name(self):
         try:
@@ -169,6 +169,7 @@ class Game(tkinter.Toplevel):
                 # print("Button state:", state)
                 #if state == "disabled":
                 if self.current_player == self.opponent_name:
+                    print("entered recv res")
                     data = self.main_parent.recv_msg(self.main_parent.client_socket)
                     print("Received data:", data)
                     data = data.split(",")
@@ -184,6 +185,7 @@ class Game(tkinter.Toplevel):
                 else:
                     # print("Receive operation skipped when it’s your turn")
                     pass
+            print("out of while running>>>game over")
         except:
             print("failed in recv_dice_res")
 
@@ -294,11 +296,17 @@ class Game(tkinter.Toplevel):
         self.withdraw()
 
     def handle_winner(self):
+        print(f"user: {self.Username}, curplayer: {self.current_player}, running: {self.running}")
         if self.Username == self.current_player:
             arr = ["WinnerExist", self.current_player]
             str_insert = ",".join(arr)
             print(str_insert)
             self.main_parent.send_msg(str_insert, self.main_parent.client_socket)
-            self.open_win_screen()
+            data = self.main_parent.recv_msg(self.main_parent.client_socket)
+            if data == "GameOver":
+                self.open_win_screen()
         else:
-            self.after(350, self.open_win_screen)
+            data = self.main_parent.recv_msg(self.main_parent.client_socket)
+            if data == "GameOver":
+                self.open_win_screen()
+            # self.after(350, self.open_win_screen)

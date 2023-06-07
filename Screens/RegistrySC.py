@@ -12,7 +12,7 @@ class Register(tkinter.Toplevel):
         super().__init__(parent)
         self.client_handler = None
         self.parent = parent
-        self.geometry("1200x720")
+        self.geometry("1200x500")
         self.title('Registration')
         self.format = 'utf-8'
         self.resizable(width=False, height=False)
@@ -20,81 +20,123 @@ class Register(tkinter.Toplevel):
         # ====================BG and Icon======================
         # self.icon = PhotoImage(file="../Photos/SAL_icon.png")
         # self.iconphoto(False, self.icon)
-        self.img = Image.open('../Photos/Anya2.jpg')
-        self.resize = self.img.resize((1200, 720), Image.Resampling.LANCZOS)
-        self.bg = ImageTk.PhotoImage(self.resize)
-        self.imgLabel = Label(self, image=self.bg)
-        self.imgLabel.pack(expand=YES)
+        self.canvas = Canvas(self, width=1200, height=500, bg='#AC94F4')
+        self.canvas.pack(expand=YES, fill=BOTH)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold")
+        self.img = Image.open("../Photos/Anya_Security.jpg")
+        self.resize = self.img.resize((175, 175), Image.Resampling.LANCZOS)
+        self.secure_img = ImageTk.PhotoImage(self.resize)
+        self.canvas.create_image(750, 180, image=self.secure_img, anchor=NW)
 
         self.create_gui()
 
     def create_gui(self):
         # ====================Labels & Entries======================
-        self.Email = StringVar()
-        self.EmailLbl = Label(self, text="Email: ", width=10, font=self.LblFont)  # place a label on the window
-        self.EmailLbl.place(x=100, y=25)
-        self.EntEmail = Entry(self, textvariable=self.Email, font=self.LblFont)
-        self.EntEmail.place(x=225, y=25)
+        self.canvas.create_oval(930, 230, 1130, 370, fill="white", outline="black", width=5)
+        self.canvas.create_text(950, 300, text="Your Information\n Is Secured :)", font=self.LblFont, anchor=W)
 
-        self.Password = StringVar()
-        self.PasswordLbl = Label(self, text="Password: ", width=10, font=self.LblFont)  # place a label on the window
-        self.PasswordLbl.place(x=100, y=75)
-        self.EntPass = Entry(self, show='●', textvariable=self.Password, font=self.LblFont)
-        self.EntPass.place(x=225, y=75)
+        self.canvas.create_text(150, 30, text="Email:", font=self.LblFont, anchor=W)
+        self.EntEmail = Entry(self, font=self.LblFont)
+        self.canvas.create_window(400, 30, window=self.EntEmail)
 
-        self.FName = StringVar()
-        self.FNameLbl = Label(self, text="First Name: ", width=10, font=self.LblFont)  # place a label on the window
-        self.FNameLbl.place(x=100, y=125)
-        self.EntFName = Entry(self, textvariable=self.FName, font=self.LblFont)
-        self.EntFName.place(x=225, y=125)
+        self.canvas.create_text(150, 80, text="Password:", font=self.LblFont, anchor=W)
+        self.EntPass = Entry(self, show='●', font=self.LblFont)
+        self.canvas.create_window(400, 80, window=self.EntPass)
 
-        self.LName = StringVar()
-        self.LNameLbl = Label(self, text="Last Name: ", width=10, font=self.LblFont)  # place a label on the window
-        self.LNameLbl.place(x=100, y=175)
-        self.EntLName = Entry(self, textvariable=self.LName, font=self.LblFont)
-        self.EntLName.place(x=225, y=175)
+        self.canvas.create_text(150, 130, text="Confirm Password:", font=self.LblFont, anchor=W)
+        self.EntConfirmPass = Entry(self, show='●', font=self.LblFont)
+        self.canvas.create_window(400, 130, window=self.EntConfirmPass)
 
-        self.Username = StringVar()
-        self.UsernameLbl = Label(self, text="Username: ", width=10, font=self.LblFont)  # place a label on the window
-        self.UsernameLbl.place(x=100, y=225)
-        self.EntUsername = Entry(self, textvariable=self.Username, font=self.LblFont)
-        self.EntUsername.place(x=225, y=225)
+        self.canvas.create_text(150, 180, text="Username:", font=self.LblFont, anchor=W)
+        self.EntUsername = Entry(self, font=self.LblFont)
+        self.canvas.create_window(400, 180, window=self.EntUsername)
 
         self.SucReg = StringVar()
         self.SucReg.set("Please Enter Information To Register")
-        self.SucRegLbl = Label(self, textvariable=self.SucReg, font=self.LblFont, background="yellow")
-        self.SucRegLbl.place(x=100, y=325)
+        self.SucRegLbl = Label(self, textvariable=self.SucReg, font=self.LblFont, background="yellow", width=40,
+                               height=5)
+        self.canvas.create_window(850, 90, window=self.SucRegLbl)
 
         # ====================Buttons======================
         self.button_reg = Button(self, text="Register", command=self.handle_add_user, font=self.LblFont, background="green")
-        self.button_reg.place(x=100, y=275)
+        self.canvas.create_window(200, 250, window=self.button_reg)
 
-        self.btn_close = Button(self, text="Close", command=self.close, background="red", font=self.LblFont)
-        self.btn_close.place(x=200, y=275)
+        self.btn_close = Button(self, text="Previous Window", command=self.close, background="red", font=self.LblFont)
+        self.canvas.create_window(350, 250, window=self.btn_close)
+
+        self.ShowIcon = Image.open('../photos/Show.png')
+        self.ShowIconResize = self.ShowIcon.resize((27, 28), Image.Resampling.LANCZOS)
+        self.ShowEye = ImageTk.PhotoImage(self.ShowIconResize)
+        self.HideIcon = Image.open('../photos/Hide.png')
+        self.HideIconResize = self.HideIcon.resize((27, 28), Image.Resampling.LANCZOS)
+        self.HideEye = ImageTk.PhotoImage(self.HideIconResize)
+        self.ShowHidePass = Button(self, image=self.ShowEye, command=self.toggle_pswrd, font=self.LblFont)
+        self.canvas.create_window(535, 80, window=self.ShowHidePass)
+
+        self.ShowHideConfirmPass = Button(self, image=self.ShowEye, command=self.toggle_confirm_pswrd, font=self.LblFont)
+        self.canvas.create_window(535, 130, window=self.ShowHideConfirmPass)
+
+    def toggle_pswrd(self):
+        try:
+            if self.EntPass.cget('show') == '':
+                self.EntPass.config(show='●')
+                self.ShowHidePass.config(image=self.ShowEye)
+            else:
+                self.EntPass.config(show='')
+                self.ShowHidePass.config(image=self.HideEye)
+        except:
+            print("failed to show/hide")
+            return False
+
+    def toggle_confirm_pswrd(self):
+        try:
+            if self.EntConfirmPass.cget('show') == '':
+                self.EntConfirmPass.config(show='●')
+                self.ShowHideConfirmPass.config(image=self.ShowEye)
+            else:
+                self.EntConfirmPass.config(show='')
+                self.ShowHideConfirmPass.config(image=self.HideEye)
+        except:
+            print("failed to show/hide")
+            return False
 
     def handle_add_user(self):
-        self.client_handler = threading.Thread(target=self.register_user, args=())
-        self.client_handler.daemon = True
-        self.client_handler.start()
+        email = self.EntEmail.get()
+        username = self.EntUsername.get()
+        password = self.EntPass.get()
+        confirm_password = self.EntConfirmPass.get()
+
+        if not email or not username or not password or not confirm_password:
+            self.SucReg.set("Please enter all the required information")
+        elif len(username) > 9:
+            self.SucReg.set("Username length must be less than or equal to 9 characters")
+        elif password != confirm_password:
+            self.SucReg.set("Passwords do not match")
+        else:
+            self.client_handler = threading.Thread(target=self.register_user, args=())
+            self.client_handler.daemon = True
+            self.client_handler.start()
 
     def register_user(self):
-        print("register")
-        arr = ["register", self.Email.get(), self.FName.get(), self.LName.get(), self.Username.get(),
-               self.Password.get()]
-        str_insert = ",".join(arr)
-        print(str_insert)
-        self.parent.send_msg(str_insert, self.parent.client_socket, "encrypted")
-        data = self.parent.recv_msg(self.parent.client_socket)
-        if data == "Successfully registered!":
-            self.SucReg.set(data)
-            self.EntEmail.delete(0, END)
-            self.EntPass.delete(0, END)
-            self.EntFName.delete(0, END)
-            self.EntLName.delete(0, END)
-            self.EntUsername.delete(0, END)
-        print(data)
+        try:
+            print("register")
+            arr = ["register", self.EntEmail.get(), self.EntUsername.get(), self.EntPass.get()]
+            str_insert = ",".join(arr)
+            print(str_insert)
+            self.parent.send_msg(str_insert, self.parent.client_socket, "encrypted")
+            data = self.parent.recv_msg(self.parent.client_socket)
+            if data == "Successfully registered!":
+                self.SucReg.set(data)
+                self.EntEmail.delete(0, END)
+                self.EntPass.delete(0, END)
+                self.EntConfirmPass.delete(0, END)
+                self.EntUsername.delete(0, END)
+            else:
+                self.SucReg.set(data)
+            print(data)
+        except:
+            self.SucReg.set("Failed Register")
 
     def close(self):
-        self.parent.deiconify()  # show parent
-        self.destroy()  # close and destroy this screen
+        self.parent.deiconify()
+        self.destroy()

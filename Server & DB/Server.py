@@ -7,7 +7,7 @@ from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
 import pickle
 
-SIZE = 8
+SIZE = 5
 
 
 class Server:
@@ -150,16 +150,18 @@ class Server:
                 print(arr)
                 cmd = arr[0]
 
-                if arr and cmd == "register" and len(arr) == 6 and arr[4] != "Err_NotExist":
+                if arr and cmd == "register" and len(arr) == 4 and arr[2] != "Err_NotExist":
                     print("Register")
                     print(arr)
-                    server_data = self.userDb.insert_user(arr[1], arr[2], arr[3], arr[4], arr[5])
+                    server_data = self.userDb.insert_user(arr[1], arr[2], arr[3])
                     print("server data:", server_data)
-                    if server_data == "Email exists":  # needs to add or server_data == "username_exists"
+                    if server_data == "Email exists":
                         self.send_msg("Email already exists", client_socket)
-                    if server_data:
+                    elif server_data == "Username taken":
+                        self.send_msg("Username taken", client_socket)
+                    elif server_data is True:
                         self.send_msg("Successfully registered!", client_socket)
-                    elif not server_data:
+                    else:
                         self.send_msg("ERROR>>> Failed to register user", client_socket)
 
                 elif arr and cmd == "login" and len(arr) == 3:
@@ -308,6 +310,8 @@ class Server:
             self.winner = player1.name
         elif player2.name == winner:
             self.winner = player2.name
+        self.send_msg("GameOver", player1.client_socket)
+        self.send_msg("GameOver", player2.client_socket)
         self.historyDb.insert_game(player1.name, player2.name, self.winner)
         self.userDb.update_wins(self.winner)
 

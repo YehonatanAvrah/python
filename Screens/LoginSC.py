@@ -12,7 +12,7 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 import pickle
 
-SIZE = 8
+SIZE = 5
 
 
 class MainWindow(tkinter.Tk):  # create a window
@@ -125,7 +125,7 @@ class MainWindow(tkinter.Tk):  # create a window
                 self.EntPass.delete(0, END)
                 self.open_menu(data)
             else:
-                err_msg = "Failed to log in, please register if you don't have an account"
+                err_msg = "Email or Password are incorrect"
                 self.UserData.set(err_msg)
             print(data)
             return data
@@ -151,16 +151,22 @@ class MainWindow(tkinter.Tk):  # create a window
         client_handler.start()
 
     def create_socket(self):
-        self.client_socket.connect(('127.0.0.1', 1956))  # first step: SYN
-        self.public_key = self.recv_msg(self.client_socket)  # Second step: SYN-ACK
-        # data = self.client_socket.recv(1024).decode()
-        print("Data is " + self.public_key)
-        self.send_msg("Hello! This is Client", self.client_socket, "encrypted")  # Third step: ACK, checking encryption
-        # print("Hello ", self.client_socket)
+        try:
+            self.client_socket.connect(('127.0.0.1', 1956))  # first step: SYN
+            self.public_key = self.recv_msg(self.client_socket)  # Second step: SYN-ACK
+            # data = self.client_socket.recv(1024).decode()
+            print("Data is " + self.public_key)
+            self.send_msg("Hello! This is Client", self.client_socket, "encrypted")  # Third step: ACK, checking encryption
+            # print("Hello ", self.client_socket)
+        except:
+            err_msg = "Server Offline"
+            self.UserData.set(err_msg)
+            self.client_socket.close()
+
 
     def send_msg(self, data, client_socket, msg_type="normal"):
         try:
-            print("The message is: " + str(data))
+            #print("The message is: " + str(data))
             if type(data) != bytes:
                 data = data.encode()
 
@@ -172,39 +178,40 @@ class MainWindow(tkinter.Tk):  # create a window
 
             length = str(len(msg)).zfill(SIZE)
             length = length.encode(self.format)
-            print(length)
+            #print(length)
 
             msg_with_length = length + msg
-            print("Message with length is: " + str(msg_with_length))
+            print(f"SEND>>> {msg_with_length}")
+            #print("Message with length is: " + str(msg_with_length))
             client_socket.send(msg_with_length)
         except:
             print("Error with sending msg")
 
     def recv_msg(self, client_socket, ret_type="string"):  # ret_type is string by default unless stated otherwise
-        try:
-            length = client_socket.recv(SIZE).decode(self.format)
-            if not length:
-                print("NO LENGTH!")
+        #try:
+        length = client_socket.recv(SIZE).decode(self.format)
+        if not length:
+            print("NO LENGTH!")
+            return None
+        print("The length is " + length)
+        data = b""
+        remaining = int(length)
+        while remaining > 0:
+            chunk = client_socket.recv(remaining)
+            if not chunk:
+                print("NO DATA!")
                 return None
-            print("The length is " + length)
-            data = b""
-            remaining = int(length)
-            while remaining > 0:
-                chunk = client_socket.recv(remaining)
-                if not chunk:
-                    print("NO DATA!")
-                    return None
-                data += chunk
-                remaining -= len(chunk)
-            print("The data is: " + str(data))
-            if ret_type == "string":
-                data = data.decode(self.format)
-            elif ret_type == "list":
-                data = pickle.loads(data)
-            print(data)
-            return data
-        except:
-            print("Error with receiving msg")
+            data += chunk
+            remaining -= len(chunk)
+        #print("The data is: " + str(data))
+        if ret_type == "string":
+            data = data.decode(self.format)
+        elif ret_type == "list":
+            data = pickle.loads(data)
+        print(f"RECV<<< {length}:{data}")
+        return data
+        #except:
+            #print("Error with receiving msg")
 
     def encrypt(self, data):
         try:
