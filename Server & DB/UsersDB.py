@@ -31,7 +31,7 @@ class Users:
             if exist_status == "Email exists":
                 print("Email already exists")
                 return "Email exists"
-            elif exist_status == "Username exists":
+            elif exist_status == "Username taken":
                 print("Username already taken")
                 return "Username taken"
 
@@ -53,6 +53,7 @@ class Users:
 
     def is_exist(self, email, username):
         try:
+            print(email, username)
             conn = sqlite3.connect('Users.db')
             print("Opened database successfully")  # check if worked
             strsql = f"SELECT * FROM {self.__tablename} WHERE {self.__email} = ? OR {self.__username} = ?"
@@ -61,11 +62,15 @@ class Users:
             row = cursor.fetchone()
             conn.close()
             if row:
+                print(row)
                 if row[1] == email:
+                    print("Email exists")
                     return "Email exists"
-                elif row[4] == username:
+                elif row[2] == username:
+                    print("Username taken")
                     return "Username taken"
-            return False
+            else:
+                return False
         except:
             print("Failed to check user existence")
             return False
@@ -192,3 +197,5 @@ class Users:
 # u.delete_user_by_id(4)
 # u.get_all_users()
 # u.update_wins("RoHakim9")
+# u.is_exist("Anya33@gmail.com", "Bondman")
+# u.insert_user('Anya33@gmail.com', "Bondman", "Ha2")

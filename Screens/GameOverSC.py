@@ -1,11 +1,10 @@
 import tkinter
 from tkinter import *
 import tkinter.font as font
-from PIL import ImageTk, Image
 
 
 class Winning_Screen(tkinter.Toplevel):
-    def __init__(self, parent, winner):
+    def __init__(self, parent):  # , winner
         super().__init__(parent)
         self.client_handler = None
         self.parent = parent  # Game
@@ -19,7 +18,7 @@ class Winning_Screen(tkinter.Toplevel):
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
         self.Username = self.parent.Username
         self.opponent_name = self.parent.opponent_name
-        self.winner = winner
+        self.winner = None
         self.loser = None
         self.set_winner()
 
@@ -36,19 +35,19 @@ class Winning_Screen(tkinter.Toplevel):
 
     def set_winner(self):
         try:
-            # print("get winner")
-            # arr = ["GetWinner", self.Username]
-            # str_insert = ",".join(arr)
-            # print(str_insert)
-            # self.main_parent.send_msg(str_insert, self.main_parent.client_socket)
-            # data = self.main_parent.recv_msg(self.main_parent.client_socket)
-            # print("Winner: " + str(data))
-            data = self.winner
+            print("get winner")
+            arr = ["GetWinner", self.Username]
+            str_insert = ",".join(arr)
+            print(str_insert)
+            self.main_parent.send_msg(str_insert, self.main_parent.client_socket)
+            data = self.main_parent.recv_msg(self.main_parent.client_socket)
+            print("Winner: " + str(data))
+            # data = self.winner
             if str(data) == self.Username:
-                # self.winner = self.Username
+                self.winner = self.Username
                 self.loser = self.opponent_name
             elif str(data) == self.opponent_name:
-                # self.winner = self.opponent_name
+                self.winner = self.opponent_name
                 self.loser = self.Username
         except:
             print("FAIL- set winner")

@@ -163,10 +163,9 @@ class MainWindow(tkinter.Tk):  # create a window
             self.UserData.set(err_msg)
             self.client_socket.close()
 
-
     def send_msg(self, data, client_socket, msg_type="normal"):
         try:
-            #print("The message is: " + str(data))
+            # print("The message is: " + str(data))
             if type(data) != bytes:
                 data = data.encode()
 
@@ -178,40 +177,41 @@ class MainWindow(tkinter.Tk):  # create a window
 
             length = str(len(msg)).zfill(SIZE)
             length = length.encode(self.format)
-            #print(length)
+            # print(length)
 
             msg_with_length = length + msg
             print(f"SEND>>> {msg_with_length}")
-            #print("Message with length is: " + str(msg_with_length))
+            # print("Message with length is: " + str(msg_with_length))
             client_socket.send(msg_with_length)
         except:
             print("Error with sending msg")
 
     def recv_msg(self, client_socket, ret_type="string"):  # ret_type is string by default unless stated otherwise
-        #try:
-        length = client_socket.recv(SIZE).decode(self.format)
-        if not length:
-            print("NO LENGTH!")
-            return None
-        print("The length is " + length)
-        data = b""
-        remaining = int(length)
-        while remaining > 0:
-            chunk = client_socket.recv(remaining)
-            if not chunk:
-                print("NO DATA!")
+        try:
+            length = client_socket.recv(SIZE).decode(self.format)
+            if not length:
+                print("NO LENGTH!")
                 return None
-            data += chunk
-            remaining -= len(chunk)
-        #print("The data is: " + str(data))
-        if ret_type == "string":
-            data = data.decode(self.format)
-        elif ret_type == "list":
-            data = pickle.loads(data)
-        print(f"RECV<<< {length}:{data}")
-        return data
-        #except:
-            #print("Error with receiving msg")
+            print("The length is " + length)
+            data = b""
+            remaining = int(length)
+            while remaining > 0:
+                chunk = client_socket.recv(remaining)
+                if not chunk:
+                    print("NO DATA!")
+                    return None
+                data += chunk
+                remaining -= len(chunk)
+            # print("The data is: " + str(data))
+            if ret_type == "string":
+                data = data.decode(self.format)
+            elif ret_type == "list":
+                data = pickle.loads(data)
+            print(f"RECV<<< {length}:{data}")
+            return data
+        except:
+            print("Error with receiving msg")
+            return "Err_Recv"
 
     def encrypt(self, data):
         try:

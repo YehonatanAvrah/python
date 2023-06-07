@@ -304,14 +304,14 @@ class Server:
     def set_winner(self, winner):
         player1 = self.players[0]
         player2 = self.players[1]
-        #self.winner = None
+        # self.winner = None
         print(f"players: {player1.name, player2.name}, winner: {winner}")
         if player1.name == winner:
             self.winner = player1.name
         elif player2.name == winner:
             self.winner = player2.name
-        # self.send_msg("GameOver", player1.client_socket)
-        # self.send_msg("GameOver", player2.client_socket)
+        self.send_msg("GameOver", player1.client_socket)
+        self.send_msg("GameOver", player2.client_socket)
         self.historyDb.insert_game(player1.name, player2.name, self.winner)
         self.userDb.update_wins(self.winner)
 

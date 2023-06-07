@@ -40,7 +40,7 @@ class GameHistory(tkinter.Toplevel):
         self.btn_close = Button(self.canvas, text="Previous Window", command=self.open_menu, background="#d4af37",
                                 font=self.LblFont)
         self.btn_close.place(x=155, y=20)
-        self.btn_refresh = Button(self.canvas, text="Refresh Table", command=self.refresh_table(),
+        self.btn_refresh = Button(self.canvas, text="Refresh Table", command=self.refresh_table,
                                   background="grey", font=self.LblFont)
         self.btn_refresh.place(x=375, y=20)
 

@@ -175,15 +175,19 @@ class Game(tkinter.Toplevel):
                 # if state == "disabled":
                 if self.current_player == self.opponent_name:
                     print("entered recv res")
-                    if self.running:
+                    if (self.running and self.player_pos1 < 100) or (self.running and self.player_pos2 < 100):
                         data = self.main_parent.recv_msg(self.main_parent.client_socket)
+                        # if data == "Err_Recv":
+                        #     self.running = False
+                        #     break
                         print("Received data:", data)
                         data = data.split(",")
                         if data[0] == "ResExist":
                             print("Opponent's result exists.")
                             result = int(data[1])
                             print("Opponent's result:", result)
-                            self.after(100, self.move_pawn, result)
+                            self.move_pawn(result)
+                            #self.after(100, self.move_pawn, result)
                             self.after(200, self.btn_roll.configure(state="active"))
                         # self.btn_roll.configure(state="active")
                         else:
@@ -271,8 +275,7 @@ class Game(tkinter.Toplevel):
                 self.winner = self.current_player
                 self.after(350, self.handle_winner)
 
-
-            #self.after(100, self.player_turn)
+            # self.after(100, self.player_turn)
 
     def check_ladder_or_snake(self):
         if self.current_player == self.player_id1:
@@ -299,7 +302,7 @@ class Game(tkinter.Toplevel):
                 self.player_pos2 = bottom_of_snake
 
     def open_win_screen(self):
-        window = Winning_Screen(self, self.winner)
+        window = Winning_Screen(self)  # , self.winner
         window.grab_set()
         self.withdraw()
 
@@ -309,12 +312,14 @@ class Game(tkinter.Toplevel):
             arr = ["WinnerExist", self.current_player]
             str_insert = ",".join(arr)
             print(str_insert)
-            #self.main_parent.send_msg(str_insert, self.main_parent.client_socket)
-            # data = self.main_parent.recv_msg(self.main_parent.client_socket)
-            # if data == "GameOver":
-            self.open_win_screen()
+            self.main_parent.send_msg(str_insert, self.main_parent.client_socket)
+            data = self.main_parent.recv_msg(self.main_parent.client_socket)
+            if data == "GameOver":
+                self.open_win_screen()
+            # self.handle_recv_dice_result()
         else:
-            # data = self.main_parent.recv_msg(self.main_parent.client_socket)
-            # if data == "GameOver":
-            self.open_win_screen()
+            data = self.main_parent.recv_msg(self.main_parent.client_socket)
+            if data == "GameOver":
+                self.open_win_screen()
+            # self.handle_recv_dice_result()
             # self.after(350, self.open_win_screen)
