@@ -26,7 +26,7 @@ class Server:
 
         self.userDb = Users()
         self.historyDb = GameHistory()
-        self.players = ()
+        self.players = []
         self.winner = None
         self.winners = []
         self.lobbies = []
@@ -179,6 +179,16 @@ class Server:
                         # err_msg = "Failed to log in, please register if you don't have an account"
                         # print(err_msg)
                         self.send_msg("Err_NotExist", client_socket)
+
+                elif arr and cmd == "GetWins" and len(arr) == 2:
+                    print(arr[1] + " is requesting for the winner's name")
+                    server_data = self.userDb.get_all_wins(arr[1])  # arr[1] = username
+                    print("server data:", server_data)
+                    if server_data:
+                        self.send_msg(server_data, client_socket)
+                    elif not server_data:
+                        print("ERROR>>> Failed to get wins")
+                        self.send_msg("Err_NoWins", client_socket)
 
                 elif arr and cmd == "waiting_room" and len(arr) == 2:
                     print("enter lobby " + arr[1])

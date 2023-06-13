@@ -57,5 +57,6 @@ class Winning_Screen(tkinter.Toplevel):
         str_insert = ",".join(arr)
         print(str_insert)
         self.main_parent.send_msg(str_insert, self.main_parent.client_socket)
+        self.parent.parent.parent.reset_wins_updated()  # reset the wins_updated flag
         self.parent.parent.parent.deiconify()  # show menu
         self.destroy()  # close and destroy this screen

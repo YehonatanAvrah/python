@@ -15,6 +15,8 @@ class Menu(tkinter.Toplevel):
         self.parent = parent
         self.geometry("750x600")
         self.title('Main Menu')
+        self.wins_updated = True
+        self.bind("<Visibility>", self.on_visibility_change)
         self.format = 'utf-8'
         self.canvas = Canvas(self, width=750, height=600, bg='#AC94F4')
         self.canvas.pack(expand=YES, fill=BOTH)
@@ -28,10 +30,9 @@ class Menu(tkinter.Toplevel):
         self.logo = ImageTk.PhotoImage(self.logo_photo)
         self.canvas.create_image(15, 120, image=self.logo, anchor=NW)
         self.Username = str(username)  # self.parent.UserData.get()
-        # wins_msg = ["GetWins", self.Username]
-        # self.parent.send_msg(wins_msg, self.parent.client_socket)
-        # self.UserWins = self.parent.recv_msg(self.parent.client_socket)
+        self.UserWins = StringVar()
         self.create_gui()
+        self.get_wins()
 
     def create_gui(self):
         # ====================Labels======================
@@ -44,6 +45,9 @@ class Menu(tkinter.Toplevel):
         # self.UserInfo.place(x=20, y=20)
         self.canvas.create_oval(20, 20, 225, 150, fill="light blue", outline="black", width=5)
         self.canvas.create_text(80, 82, text=self.Username, fill="black", font=self.LblFont)
+
+        self.UserWinsDataLbl = Label(self, textvariable=self.UserWins, font=self.LblFont, bg='light blue')
+        self.UserWinsDataLbl.place(x=175, y=70)
 
         # ====================Buttons======================
         self.btn_settings = Button(self.canvas, text="Settings", command=self.open_settings, background="Gray", font=self.LblFont)
@@ -71,6 +75,28 @@ class Menu(tkinter.Toplevel):
         window = Lobby(self)
         window.grab_set()
         self.withdraw()
+
+    def get_wins(self):
+        try:
+            wins_msg = ["GetWins", self.Username]
+            str_insert = ",".join(wins_msg)
+            print(str_insert)
+            self.parent.send_msg(str_insert, self.parent.client_socket)
+            data = self.parent.recv_msg(self.parent.client_socket)
+            if data is not None:
+                self.UserWins.set(data)
+            else:
+                print(f"UserWins - failed: {data}")
+        except:
+            print("fail - wins menu")
+
+    def on_visibility_change(self, event):
+        if self.state() == "normal" and not self.wins_updated:
+            self.get_wins()
+            self.wins_updated = True
+
+    def reset_wins_updated(self):
+        self.wins_updated = False
 
     # def close(self):
     #     self.parent.deiconify()  # show parent
