@@ -53,5 +53,9 @@ class Winning_Screen(tkinter.Toplevel):
             print("FAIL- set winner")
 
     def open_menu(self):
+        arr = ["leave_win", self.Username]
+        str_insert = ",".join(arr)
+        print(str_insert)
+        self.main_parent.send_msg(str_insert, self.main_parent.client_socket)
         self.parent.parent.parent.deiconify()  # show menu
         self.destroy()  # close and destroy this screen

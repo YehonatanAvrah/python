@@ -26,9 +26,10 @@ class Server:
 
         self.userDb = Users()
         self.historyDb = GameHistory()
-        self.players = []
+        self.players = ()
         self.winner = None
         self.winners = []
+        self.lobbies = []
 
     def start_server(self):
         try:
@@ -208,6 +209,9 @@ class Server:
                     print("Server data: ", server_data)
                     self.send_msg(server_data, client_socket, "list")
 
+                elif arr and cmd == "leave_win" and len(arr) == 2:
+                    print("close lobby")
+                    self.remove_lobby(arr[1])  # arr[1] = username
 
                 elif arr and cmd == "exit" and len(arr) == 1:
                     print("exit")
@@ -228,20 +232,42 @@ class Server:
                 break
         client_socket.close()
 
+    # def handle_lobby(self, username, client_socket):
+    #     print("handle lobby")
+    #     player = Player(client_socket, username)
+    #     self.players.append(player)
+    #     print(len(self.players))
+    #     if len(self.players) == 1:
+    #         print("1 player")
+    #         data = ["Wait", username]
+    #         join_data = ",".join(data)
+    #         self.send_msg(join_data, client_socket)
+    #     elif len(self.players) == 2:
+    #         print("2 players")
+    #         player1 = self.players[0]
+    #         player2 = self.players[1]
+    #         socket1 = player1.client_socket
+    #         socket2 = player2.client_socket
+    #         data1 = ["Start", player1.name]
+    #         data2 = ["Start", player2.name]
+    #         str_data1 = ",".join(data1)
+    #         str_data2 = ",".join(data2)
+    #         print("Sending data")
+    #         self.send_msg(str_data2, socket1)
+    #         self.send_msg(str_data1, socket2)
+
     def handle_lobby(self, username, client_socket):
         print("handle lobby")
         player = Player(client_socket, username)
-        self.players.append(player)
-        print(len(self.players))
-        if len(self.players) == 1:
-            print("1 player")
-            data = ["Wait", username]
-            join_data = ",".join(data)
-            self.send_msg(join_data, client_socket)
-        elif len(self.players) == 2:
-            print("2 players")
-            player1 = self.players[0]
-            player2 = self.players[1]
+
+        # Check if there is an existing lobby with only one player
+        existing_lobby = next((lobby for lobby in self.lobbies if len(lobby) == 1), None)
+
+        if existing_lobby:
+            # Add the current player to the existing lobby
+            existing_lobby.append(player)
+            print("2 players in the lobby")
+            player1, player2 = existing_lobby
             socket1 = player1.client_socket
             socket2 = player2.client_socket
             data1 = ["Start", player1.name]
@@ -251,6 +277,89 @@ class Server:
             print("Sending data")
             self.send_msg(str_data2, socket1)
             self.send_msg(str_data1, socket2)
+
+            # Remove the lobby from the list since it's complete
+            # self.lobbies.remove(existing_lobby)
+        else:
+            # Create a new lobby with the current player
+            new_lobby = [player]
+            self.lobbies.append(new_lobby)
+            print("1 player in the lobby")
+            data = ["Wait", username]
+            join_data = ",".join(data)
+            self.send_msg(join_data, client_socket)
+
+    def handle_dice(self, result, username):
+        print("dice result")
+        lobby = next((lobby for lobby in self.lobbies if username in [player.name for player in lobby]), None)
+        if lobby:
+            player1, player2 = lobby
+            data = ["ResExist", result]
+            str_data = ",".join(data)
+            if username == player1.name:
+                print(f"{player1.name}'s dice result")
+                self.send_msg(str_data, player2.client_socket)
+            elif username == player2.name:
+                print(f"{player2.name}'s dice result")
+                self.send_msg(str_data, player1.client_socket)
+
+    def get_names(self, username):
+        lobby = next((lobby for lobby in self.lobbies if username in [player.name for player in lobby]), None)
+        if lobby:
+            player1, player2 = lobby
+            print(f"{player1.name, player2.name}")
+            if player1.name == username:
+                self.send_msg(player2.name, player1.client_socket)
+            elif player2.name == username:
+                self.send_msg(player1.name, player2.client_socket)
+
+    def get_id(self, username):
+        lobby = next((lobby for lobby in self.lobbies if username in [player.name for player in lobby]), None)
+        if lobby:
+            player1, player2 = lobby
+            print(f"{player1.name, player2.name}")
+            if player1.name == username:
+                self.send_msg(player1.name, player1.client_socket)
+            elif player2.name == username:
+                self.send_msg(player1.name, player2.client_socket)
+
+    def set_winner(self, winner):
+        lobby = next((lobby for lobby in self.lobbies if winner in [player.name for player in lobby]), None)
+        if lobby:
+            player1, player2 = lobby
+            print(f"players: {player1.name, player2.name}, winner: {winner}")
+            if player1.name == winner:
+                self.winner = player1.name
+            elif player2.name == winner:
+                self.winner = player2.name
+            self.send_msg("GameOver", player1.client_socket)
+            self.send_msg("GameOver", player2.client_socket)
+            self.historyDb.insert_game(player1.name, player2.name, self.winner)
+            self.userDb.update_wins(self.winner)
+
+    def get_winner(self, username):
+        try:
+            lobby = next((lobby for lobby in self.lobbies if username in [player.name for player in lobby]), None)
+            if lobby:
+                player1, player2 = lobby
+                print("0")
+                if player1.name == username:
+                    self.send_msg(self.winner, player1.client_socket)
+                    print("1")
+                elif player2.name == username:
+                    self.send_msg(self.winner, player2.client_socket)
+                    print("2")
+        except:
+            print("fail - get winner")
+
+    def remove_lobby(self, username):
+        try:
+            lobby = next((lobby for lobby in self.lobbies if username in [player.name for player in lobby]), None)
+            if lobby:
+                self.lobbies.remove(lobby)
+                print("removed lobby")
+        except:
+            print("fail - remove lobby")
 
     def handle_game(self, username):
         print("handle game")
@@ -265,69 +374,69 @@ class Server:
             self.send_msg("PlayerID1Turn", player1.client_socket)
             self.send_msg("PlayerID1Turn", player2.client_socket)
 
-    def handle_dice(self, result, username):
-        print("dice result")
-        player1 = self.players[0]
-        player2 = self.players[1]
-        data = ["ResExist", result]
-        str_data = ",".join(data)
-        if username == player1.name:
-            print(f"{player1.name}'s dice result")
-            self.send_msg(str_data, player2.client_socket)
-            # self.send_msg("WaitResult", player1.client_socket)
-            # self.send_msg("PlayerID2Turn", player2.client_socket)
-        elif username == player2.name:
-            print(f"{player2.name}'s dice result")
-            self.send_msg(str_data, player1.client_socket)
-            # self.send_msg("WaitResult", player2.client_socket)
-
-    def get_names(self, username):
-        player1 = self.players[0]
-        player2 = self.players[1]
-        print(f"{player1.name, player2.name}")
-        if player1.name == username:
-            self.send_msg(player2.name, player1.client_socket)
-        elif player2.name == username:
-            self.send_msg(player1.name, player2.client_socket)
-
-    def get_id(self, username):
-        player1 = self.players[0]
-        player2 = self.players[1]
-        print(f"{player1.name, player2.name}")
-        if player1.name == username:
-            self.send_msg(player1.name, player1.client_socket)
-        elif player2.name == username:
-            self.send_msg(player1.name, player2.client_socket)
-        # self.send_msg(player1.name, player1.client_socket)  # sending the first player who entered the lobby
-        # self.send_msg(player1.name, player2.client_socket)
-
-    def set_winner(self, winner):
-        player1 = self.players[0]
-        player2 = self.players[1]
-        # self.winner = None
-        print(f"players: {player1.name, player2.name}, winner: {winner}")
-        if player1.name == winner:
-            self.winner = player1.name
-        elif player2.name == winner:
-            self.winner = player2.name
-        self.send_msg("GameOver", player1.client_socket)
-        self.send_msg("GameOver", player2.client_socket)
-        self.historyDb.insert_game(player1.name, player2.name, self.winner)
-        self.userDb.update_wins(self.winner)
-
-    def get_winner(self, username):
-        try:
-            player1 = self.players[0]
-            player2 = self.players[1]
-            print("0")
-            if player1.name == username:
-                self.send_msg(self.winner, player1.client_socket)
-                print("1")
-            elif player2.name == username:
-                self.send_msg(self.winner, player2.client_socket)
-                print("2")
-        except:
-            print("fail - get winner")
+    # def handle_dice(self, result, username):
+    #     print("dice result")
+    #     player1 = self.players[0]
+    #     player2 = self.players[1]
+    #     data = ["ResExist", result]
+    #     str_data = ",".join(data)
+    #     if username == player1.name:
+    #         print(f"{player1.name}'s dice result")
+    #         self.send_msg(str_data, player2.client_socket)
+    #         # self.send_msg("WaitResult", player1.client_socket)
+    #         # self.send_msg("PlayerID2Turn", player2.client_socket)
+    #     elif username == player2.name:
+    #         print(f"{player2.name}'s dice result")
+    #         self.send_msg(str_data, player1.client_socket)
+    #         # self.send_msg("WaitResult", player2.client_socket)
+    #
+    # def get_names(self, username):
+    #     player1 = self.players[0]
+    #     player2 = self.players[1]
+    #     print(f"{player1.name, player2.name}")
+    #     if player1.name == username:
+    #         self.send_msg(player2.name, player1.client_socket)
+    #     elif player2.name == username:
+    #         self.send_msg(player1.name, player2.client_socket)
+    #
+    # def get_id(self, username):
+    #     player1 = self.players[0]
+    #     player2 = self.players[1]
+    #     print(f"{player1.name, player2.name}")
+    #     if player1.name == username:
+    #         self.send_msg(player1.name, player1.client_socket)
+    #     elif player2.name == username:
+    #         self.send_msg(player1.name, player2.client_socket)
+    #     # self.send_msg(player1.name, player1.client_socket)  # sending the first player who entered the lobby
+    #     # self.send_msg(player1.name, player2.client_socket)
+    #
+    # def set_winner(self, winner):
+    #     player1 = self.players[0]
+    #     player2 = self.players[1]
+    #     # self.winner = None
+    #     print(f"players: {player1.name, player2.name}, winner: {winner}")
+    #     if player1.name == winner:
+    #         self.winner = player1.name
+    #     elif player2.name == winner:
+    #         self.winner = player2.name
+    #     self.send_msg("GameOver", player1.client_socket)
+    #     self.send_msg("GameOver", player2.client_socket)
+    #     self.historyDb.insert_game(player1.name, player2.name, self.winner)
+    #     self.userDb.update_wins(self.winner)
+    #
+    # def get_winner(self, username):
+    #     try:
+    #         player1 = self.players[0]
+    #         player2 = self.players[1]
+    #         print("0")
+    #         if player1.name == username:
+    #             self.send_msg(self.winner, player1.client_socket)
+    #             print("1")
+    #         elif player2.name == username:
+    #             self.send_msg(self.winner, player2.client_socket)
+    #             print("2")
+    #     except:
+    #         print("fail - get winner")
 
 
 if __name__ == '__main__':

@@ -56,7 +56,3 @@ class GameHistory:
 
 # H = GameHistory()
 # print(H.get_history())
-
-
-
-

@@ -120,7 +120,8 @@ class MainWindow(tkinter.Tk):  # create a window
             print(str_insert)
             self.send_msg(str_insert, self.client_socket, "encrypted")
             data = self.recv_msg(self.client_socket)
-            if data is not None and data != "Err_NotExist" and data != "Please send data according to protocol":
+            if data is not None and data != "Err_NotExist" and data != "Please send data according to protocol" \
+                    and data != "Err_Recv":
                 self.UserData.set("Logged in successfully, Welcome back")
                 self.EntPass.delete(0, END)
                 self.open_menu(data)
