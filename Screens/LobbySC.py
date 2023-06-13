@@ -14,7 +14,8 @@ class Lobby(tkinter.Toplevel):
         self.geometry("750x600")
         self.title('Lobby')
         self.format = 'utf-8'
-        self.canvas = Canvas(self, width=750, height=600, bg='#AC94F4')
+        self.bg_color = self.parent.bg_color
+        self.canvas = Canvas(self, width=750, height=600, bg=self.bg_color)
         self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)

@@ -114,6 +114,8 @@ class MainWindow(tkinter.Tk):  # create a window
 
     def login(self):
         try:
+            if len(self.Email.get()) > 25 or len(self.Password.get()) > 25:
+                self.UserData.set("Email or password too long")
             print("[logging in...]")
             arr = ["login", self.Email.get(), self.Password.get()]
             str_insert = ",".join(arr)

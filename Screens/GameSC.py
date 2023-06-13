@@ -16,7 +16,8 @@ class Game(tkinter.Toplevel):
         self.geometry("1800x1010")
         self.title('Game Screen - Snakes And Ladders')
         self.format = 'utf-8'
-        self.canvas = Canvas(self, width=1800, height=1010, bg='#AC94F4')
+        self.bg_color = self.parent.parent.bg_color
+        self.canvas = Canvas(self, width=1800, height=1010, bg=self.bg_color)
         self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
@@ -66,7 +67,7 @@ class Game(tkinter.Toplevel):
         self.dice_icon = ImageTk.PhotoImage(self.dice_resize)
         self.load_dice_nums()
         self.btn_roll = Button(self, image=self.dice_icon, command=self.roll_dice, height=80, width=80,
-                               background="#AC94F4", activebackground="#AC94F4")
+                               background=self.bg_color, activebackground=self.bg_color)
         self.btn_roll.place(x=1300, y=300)
         if self.Username != self.player_id1:
             self.btn_roll.configure(state="disabled")

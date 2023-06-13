@@ -109,7 +109,7 @@ class Register(tkinter.Toplevel):
         if not email or not username or not password or not confirm_password:
             self.SucReg.set("Please enter all the required information")
         elif len(username) > 9:
-            self.SucReg.set("Username length must be less than or equal to 9 characters")
+            self.SucReg.set("Username too long")
         elif password != confirm_password:
             self.SucReg.set("Passwords do not match")
         else:

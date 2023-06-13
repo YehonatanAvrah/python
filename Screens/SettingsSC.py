@@ -2,6 +2,7 @@ import tkinter
 from tkinter import *
 import tkinter.font as font
 from tkinter import messagebox
+from tkinter.colorchooser import askcolor
 
 
 class Settings(tkinter.Toplevel):
@@ -56,6 +57,9 @@ class Settings(tkinter.Toplevel):
         self.btn_close = Button(self.canvas, text="Previous Window", command=self.open_menu, background="#d4af37",
                                  font=self.LblFont)
         self.btn_close.place(x=155, y=20)
+        self.btn_color = Button(self.canvas, text="Change Background", command=self.backgroundcolor,
+                                background="light blue", font=self.LblFont)
+        self.btn_color.place(x=300, y=20)
 
     def open_login(self):
         self.main_parent.deiconify()  # show main parent
@@ -69,3 +73,8 @@ class Settings(tkinter.Toplevel):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
             self.main_parent.send_msg("exit", self.main_parent.client_socket)
             self.destroy()
+
+    def backgroundcolor(self):
+        color = askcolor()[1]
+        self.parent.canvas.configure(bg=color)
+        self.parent.bg_color = color

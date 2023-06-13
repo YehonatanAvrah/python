@@ -1,4 +1,3 @@
-import threading
 import tkinter
 from tkinter import *
 import tkinter.font as font
@@ -18,6 +17,7 @@ class Menu(tkinter.Toplevel):
         self.wins_updated = True
         self.bind("<Visibility>", self.on_visibility_change)
         self.format = 'utf-8'
+        self.bg_color = '#AC94F4'
         self.canvas = Canvas(self, width=750, height=600, bg='#AC94F4')
         self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
