@@ -103,5 +103,5 @@ class Menu(tkinter.Toplevel):
     def on_closing(self):
         if messagebox.askokcancel("Quit Game", "Do you want to quit?"):
             self.parent.send_msg("exit", self.parent.client_socket)
-            self.destroy()
+            self.parent.destroy()
             self.parent.client_socket.close()

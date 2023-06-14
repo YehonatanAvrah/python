@@ -4,7 +4,6 @@ from tkinter import *
 import threading
 import tkinter.font as font
 from tkinter import messagebox
-
 from PIL import ImageTk, Image
 from GameOverSC import Winning_Screen
 
@@ -100,6 +99,10 @@ class Game(tkinter.Toplevel):
             data = self.main_parent.recv_msg(self.main_parent.client_socket)
             print(data)
             return data
+        except ConnectionResetError as e:
+            print("Connection reset error in game:", str(e))  # Server disconnected
+            self.main_parent.client_socket.close()
+            self.main_parent.destroy()
         except:
             print("FAIL- GetOppoName")
             return "FAIL- GetOppoName"
@@ -119,6 +122,10 @@ class Game(tkinter.Toplevel):
             elif str(data) == self.opponent_name:
                 self.player_id1 = self.opponent_name
                 self.player_id2 = self.Username
+        except ConnectionResetError as e:
+            print("Connection reset error in game:", str(e))  # Server disconnected
+            self.main_parent.client_socket.close()
+            self.main_parent.destroy()
         except:
             print("FAIL- set id")
 
@@ -194,14 +201,32 @@ class Game(tkinter.Toplevel):
                             #self.after(100, self.move_pawn, result)
                             self.after(200, self.btn_roll.configure(state="active"))
                         # self.btn_roll.configure(state="active")
+                        elif data[0] == "OppoLeft":
+                            self.turn_lbl.config(text=f"{self.opponent_name} Left")
+                            self.current_player = self.Username
+                            self.after(100, self.handle_winner)
+                        elif data[0] == "Err_Recv":
+                            self.main_parent.client_socket.close()
+                            self.main_parent.destroy()
                         else:
                             print("Invalid data received:", data)
+                            self.main_parent.client_socket.close()
+                            self.main_parent.destroy()
                 else:
                     # print("Receive operation skipped when it’s your turn")
                     pass
             print("out of while running>>>game over")
+        except ConnectionResetError as e:
+            print("Connection reset error in game:", str(e))  # Server disconnected
+            self.main_parent.client_socket.close()
+            self.main_parent.destroy()
         except:
             print("failed in recv_dice_res")
+            self.turn_lbl.config(text="Server Offline")
+            self.main_parent.destroy()
+            self.main_parent.client_socket.close()
+
+
 
     def roll_dice(self):
         r = random.randint(1, 6)
@@ -331,5 +356,5 @@ class Game(tkinter.Toplevel):
     def on_closing(self):
         if messagebox.askokcancel("Quit Game", "Do you want to quit?"):
             self.main_parent.send_msg("exit", self.main_parent.client_socket)
-            self.destroy()
+            self.main_parent.destroy()
             self.main_parent.client_socket.close()

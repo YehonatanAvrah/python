@@ -232,11 +232,24 @@ class Server:
                     self.remove_lobby(arr[1])  # arr[1] = username
 
                 elif arr and cmd == "exit" and len(arr) == 1:
-                    print(f"client {client_socket} left")
+                    print(f"client left")
                     running = False  # change the variable to exit the loop
-                    # server_data = "You've successfully disconnected"
                     self.count -= 1
-                    # self.send_msg(server_data, client_socket)
+
+                    lobby = next((lobby for lobby in self.lobbies if client_socket in
+                                  [player.client_socket for player in lobby]), None)
+                    if lobby and len(lobby) != 1:
+                        player1, player2 = lobby
+                        if player1.client_socket == client_socket:
+                            self.send_msg("OppoLeft", player2.client_socket)
+                        elif player2.client_socket == client_socket:
+                            self.send_msg("OppoLeft", player1.client_socket)
+                    elif lobby and len(lobby) == 1:
+                        player = lobby[0]
+                        print("player:" + player.name)
+                        self.remove_lobby(player.name)
+                    else:
+                        pass
 
                 else:  # if the data from the client is false according to the protocol
                     server_data = "Please send data according to protocol"
@@ -282,8 +295,7 @@ class Server:
         # Check if there is an existing lobby with only one player
         existing_lobby = next((lobby for lobby in self.lobbies if len(lobby) == 1), None)
 
-        if existing_lobby:
-            # Add the current player to the existing lobby
+        if existing_lobby:  # Add the current player to the existing lobby
             existing_lobby.append(player)
             print("2 players in the lobby")
             player1, player2 = existing_lobby
@@ -297,10 +309,7 @@ class Server:
             self.send_msg(str_data2, socket1)
             self.send_msg(str_data1, socket2)
 
-            # Remove the lobby from the list since it's complete
-            # self.lobbies.remove(existing_lobby)
-        else:
-            # Create a new lobby with the current player
+        else:  # Create a new lobby with the current player
             new_lobby = [player]
             self.lobbies.append(new_lobby)
             print("1 player in the lobby")

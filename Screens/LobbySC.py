@@ -81,6 +81,10 @@ class Lobby(tkinter.Toplevel):
                     print("two players")
                     self.player_list.insert(2, arr_data[1])
                     self.countdown()
+        except ConnectionResetError as e:
+            print("Connection reset error in lobby:", str(e))  # Server disconnected
+            self.main_parent.client_socket.close()
+            self.main_parent.destroy()
         except:
             print("fail- lobby")
 
@@ -90,16 +94,21 @@ class Lobby(tkinter.Toplevel):
         self.withdraw()
 
     def countdown(self):
-        self.canvas.itemconfig(self.wait, text="Full Party,\n Starting Game...")  # (self.wait, state='hidden')
-        if self.timer > 0:
-            self.canvas.itemconfig(self.timer_text, text=str(self.timer))
-            self.timer -= 1
-            self.canvas.after(1000, self.countdown)
-        else:
-            self.open_game()
+        try:
+            self.canvas.itemconfig(self.wait, text="Full Party,\n Starting Game...")  # (self.wait, state='hidden')
+            if self.timer > 0:
+                self.canvas.itemconfig(self.timer_text, text=str(self.timer))
+                self.timer -= 1
+                self.canvas.after(1000, self.countdown)
+            else:
+                self.open_game()
+        except ConnectionResetError as e:
+            print("Connection reset error in lobby:", str(e))  # Server disconnected
+            self.main_parent.client_socket.close()
+            self.main_parent.destroy()
 
     def on_closing(self):
         if messagebox.askokcancel("Quit Game", "Do you want to quit?"):
             self.main_parent.send_msg("exit", self.main_parent.client_socket)
-            self.destroy()
+            self.main_parent.destroy()
             self.main_parent.client_socket.close()

@@ -90,5 +90,5 @@ class Winning_Screen(tkinter.Toplevel):
     def on_closing(self):
         if messagebox.askokcancel("Quit Game", "Do you want to quit?"):
             self.main_parent.send_msg("exit", self.main_parent.client_socket)
-            self.destroy()
+            self.main_parent.destroy()
             self.main_parent.client_socket.close()

@@ -12,33 +12,29 @@ class Settings(tkinter.Toplevel):
         self.parent = parent  # menu
         self.main_parent = parent.parent  # login
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
-        self.geometry("950x850")
+        self.geometry("950x620")
         self.title('Settings')
         self.format = 'utf-8'
-        self.canvas = Canvas(self, width=950, height=850, bg='#bbbbbb')
+        self.canvas = Canvas(self, width=950, height=620, bg='#bbbbbb')
         self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
         self.LblFontUnder = font.Font(family='Comic Sans MS', weight="bold", size=15, underline=True)
 
-        # ====================Icon======================
-        # self.icon = PhotoImage(file="../Photos/SAL_icon.png")
-        # self.iconphoto(False, self.icon)
-
         self.create_gui()
 
     def create_gui(self):
         # ====================Labels======================
-        self.canvas.create_text(140, 200, text="Game Instructions", fill="black", font=self.LblFontUnder)
-        self.canvas.create_rectangle(50, 230, 900, 700, fill="#AC94F4", outline="black")
-        self.canvas.create_text(150, 260, text="Game Accessories", fill="black", font=self.LblFontUnder)
+        self.canvas.create_text(140, 95, text="Game Instructions", fill="black", font=self.LblFontUnder)
+        self.canvas.create_rectangle(50, 125, 900, 595, fill="#AC94F4", outline="black")
+        self.canvas.create_text(150, 155, text="Game Accessories", fill="black", font=self.LblFontUnder)
 
-        self.canvas.create_text(190, 325, text="● Board with 100 slots\n"
+        self.canvas.create_text(190, 220, text="● Board with 100 slots\n"
                                                "● Game Cube\n"
                                                "● Game Soldiers", fill="black", font=self.LblFont)
 
-        self.canvas.create_text(120, 440, text="Game Rules", fill="black", font=self.LblFontUnder)
-        self.canvas.create_text(460, 565, text="On the game board, there are numbers from 1 to 100 on each slot.\n"
+        self.canvas.create_text(120, 335, text="Game Rules", fill="black", font=self.LblFontUnder)
+        self.canvas.create_text(460, 460, text="On the game board, there are numbers from 1 to 100 on each slot.\n"
                                                "In turns, the players roll a die. The number of slots that a player\n"
                                                "moves is equal to the value that comes out on the die.\n"
                                                "Some squares have ladders to help you go up the board to"
@@ -53,13 +49,13 @@ class Settings(tkinter.Toplevel):
         # ====================Buttons======================
         self.btn_logout = Button(self.canvas, text="Logout", command=self.open_login, background="red",
                                    font=self.LblFont)
-        self.btn_logout.place(x=55, y=20)
+        self.btn_logout.place(x=820, y=20)
         self.btn_close = Button(self.canvas, text="Previous Window", command=self.open_menu, background="#d4af37",
                                  font=self.LblFont)
-        self.btn_close.place(x=155, y=20)
+        self.btn_close.place(x=620, y=20)
         self.btn_color = Button(self.canvas, text="Change Background", command=self.backgroundcolor,
                                 background="light blue", font=self.LblFont)
-        self.btn_color.place(x=350, y=20)
+        self.btn_color.place(x=50, y=20)
 
     def open_login(self):
         self.main_parent.deiconify()  # show main parent
@@ -72,7 +68,7 @@ class Settings(tkinter.Toplevel):
     def on_closing(self):
         if messagebox.askokcancel("Quit Game", "Do you want to quit?"):
             self.main_parent.send_msg("exit", self.main_parent.client_socket)
-            self.destroy()
+            self.main_parent.destroy()
             self.main_parent.client_socket.close()
 
     def backgroundcolor(self):

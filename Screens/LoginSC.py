@@ -117,22 +117,23 @@ class MainWindow(tkinter.Tk):  # create a window
         try:
             if len(self.Email.get()) > 25 or len(self.Password.get()) > 25:
                 self.UserData.set("Email or password too long")
-            print("[logging in...]")
-            arr = ["login", self.Email.get(), self.Password.get()]
-            str_insert = ",".join(arr)
-            print(str_insert)
-            self.send_msg(str_insert, self.client_socket, "encrypted")
-            data = self.recv_msg(self.client_socket)
-            if data is not None and data != "Err_NotExist" and data != "Please send data according to protocol" \
-                    and data != "Err_Recv":
-                self.UserData.set("Logged in successfully, Welcome back")
-                self.EntPass.delete(0, END)
-                self.open_menu(data)
             else:
-                err_msg = "Email or Password are incorrect"
-                self.UserData.set(err_msg)
-            print(data)
-            return data
+                print("[logging in...]")
+                arr = ["login", self.Email.get(), self.Password.get()]
+                str_insert = ",".join(arr)
+                print(str_insert)
+                self.send_msg(str_insert, self.client_socket, "encrypted")
+                data = self.recv_msg(self.client_socket)
+                if data is not None and data != "Err_NotExist" and data != "Please send data according to protocol" \
+                        and data != "Err_Recv":
+                    self.UserData.set("Logged in successfully, Welcome back")
+                    self.EntPass.delete(0, END)
+                    self.open_menu(data)
+                else:
+                    err_msg = "Email or Password are incorrect"
+                    self.UserData.set(err_msg)
+                print(data)
+                return data
         except:
             print("fail :(")
             showerror("ERROR", 'Failed logging in')
@@ -167,6 +168,7 @@ class MainWindow(tkinter.Tk):  # create a window
             err_msg = "Server Offline"
             self.UserData.set(err_msg)
             self.client_socket.close()
+            showerror("ERROR", 'Server Is Currently Offline')
 
     def send_msg(self, data, client_socket, msg_type="normal"):
         try:
