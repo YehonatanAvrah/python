@@ -34,8 +34,12 @@ class Lobby(tkinter.Toplevel):
         self.canvas.create_image(235, 165, image=self.logo, anchor=NW)
 
     def create_gui(self):
+        self.party_photo = Image.open("../Photos/party_mem.png")
+        self.resize_party = self.party_photo.resize((180, 50), Image.LANCZOS)
+        self.party = ImageTk.PhotoImage(self.resize_party)
+        self.canvas.create_image(15, 100, image=self.party, anchor=NW)
         # ====================Labels======================
-        self.canvas.create_text(90, 125, text="Party Members", fill="black", font=self.LblFontUnder)
+        # self.canvas.create_text(90, 125, text="Party Members", fill="black", font=self.LblFontUnder)
         self.canvas.create_oval(280, 40, 480, 180, fill="white", outline="black", width=5)
         self.canvas.create_oval(358, 202, 368, 212, fill="white", outline="black", width=3)
         self.canvas.create_oval(345, 190, 355, 200, fill="white", outline="black", width=3)
@@ -85,8 +89,10 @@ class Lobby(tkinter.Toplevel):
             print("Connection reset error in lobby:", str(e))  # Server disconnected
             self.main_parent.client_socket.close()
             self.main_parent.destroy()
-        except:
-            print("fail- lobby")
+        except Exception as e:
+            print("Exception occurred in lobby:", str(e))
+            self.main_parent.client_socket.close()
+            self.main_parent.destroy()
 
     def open_game(self):
         window = Game(self)

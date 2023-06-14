@@ -75,3 +75,7 @@ class Settings(tkinter.Toplevel):
         color = askcolor()[1]
         self.parent.canvas.configure(bg=color)
         self.parent.bg_color = color
+        if color == '#000000':
+            self.parent.canvas.itemconfig(self.parent.wel, fill='#FFFFFF')
+        else:
+            self.parent.canvas.itemconfig(self.parent.wel, fill='#000000')

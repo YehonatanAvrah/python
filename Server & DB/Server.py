@@ -262,6 +262,18 @@ class Server:
                 self.count -= 1
                 break
         print(f"Closed: {client_socket}")
+        lobby = next((lobby for lobby in self.lobbies if client_socket in
+                      [player.client_socket for player in lobby]), None)
+        if lobby and len(lobby) != 1:
+            player1, player2 = lobby
+            if player1.client_socket == client_socket:
+                self.send_msg("OppoLeft", player2.client_socket)
+            elif player2.client_socket == client_socket:
+                self.send_msg("OppoLeft", player1.client_socket)
+        elif lobby and len(lobby) == 1:
+            player = lobby[0]
+            print("player:" + player.name)
+            self.remove_lobby(player.name)
         client_socket.close()
 
     # def handle_lobby(self, username, client_socket):
@@ -380,7 +392,6 @@ class Server:
     def remove_lobby(self, username):
         try:
             lobby = next((lobby for lobby in self.lobbies if username in [player.name for player in lobby]), None)
-            print(lobby)
             if lobby:
                 self.lobbies.remove(lobby)
                 print("removed lobby")

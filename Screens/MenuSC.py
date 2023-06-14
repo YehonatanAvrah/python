@@ -24,10 +24,9 @@ class Menu(tkinter.Toplevel):
         self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
+        self.LblFontUnder = font.Font(family='Comic Sans MS', weight="bold", size=15, underline=True)
 
         # ====================Logo======================
-        # self.icon = PhotoImage(file="../Photos/SAL_icon.png")
-        # self.iconphoto(False, self.icon)
         self.logo_photo = Image.open("../Photos/SAL_Logo.png")
         self.logo = ImageTk.PhotoImage(self.logo_photo)
         self.canvas.create_image(15, 120, image=self.logo, anchor=NW)
@@ -39,17 +38,17 @@ class Menu(tkinter.Toplevel):
     def create_gui(self):
         # ====================Labels======================
         print(self.Username)
-        self.canvas.create_text(400, 120, text=f"Welcome back, {self.Username}", fill="black", font=self.LblFont)
-        # self.WelMsg = "Welcome back, username" # + str(self.Username)
-        # self.WelMsgLbl = Label(self, text=self.WelMsg, font=self.LblFont, bg='#AC94F4')
-        # self.WelMsgLbl.place(x=255, y=120)
-        # self.UserInfo = Label(self, text="username", font=self.LblFont, bg='light blue')
-        # self.UserInfo.place(x=20, y=20)
+        self.wel = self.canvas.create_text(400, 120, text=f"Welcome back, {self.Username}", fill='black',
+                                           font=self.LblFontUnder)
         self.canvas.create_oval(20, 20, 225, 150, fill="light blue", outline="black", width=5)
         self.canvas.create_text(80, 82, text=self.Username, fill="black", font=self.LblFont)
 
         self.UserWinsDataLbl = Label(self, textvariable=self.UserWins, font=self.LblFont, bg='light blue')
-        self.UserWinsDataLbl.place(x=175, y=70)
+        self.UserWinsDataLbl.place(x=175, y=68)
+        self.crown_photo = Image.open("../Photos/crown.png")
+        self.resize_crown = self.crown_photo.resize((35, 30), Image.LANCZOS)
+        self.crown = ImageTk.PhotoImage(self.resize_crown)
+        self.canvas.create_image(155, 70, image=self.crown, anchor=N)
 
         # ====================Buttons======================
         self.btn_settings = Button(self.canvas, text="Settings", command=self.open_settings, background="Gray", font=self.LblFont)
@@ -57,8 +56,8 @@ class Menu(tkinter.Toplevel):
         self.btn_history = Button(self.canvas, text="Game History", command=self.open_history, background="#ff8b3d",
                                   font=self.LblFont)
         self.btn_history.place(x=125, y=420)
-        self.btn_game = Button(self.canvas, text="Ready", command=self.open_lobby, background="lime", font=self.LblFont)
-        self.btn_game.place(x=575, y=420)
+        self.btn_game = Button(self.canvas, text="Search Game", command=self.open_lobby, background="lime", font=self.LblFont)
+        self.btn_game.place(x=525, y=420)
 
         # self.btn_close = Button(self, text="Close", command=self.close, background="red", font=self.LblFont)
         # self.btn_close.place(x=625, y=80)
