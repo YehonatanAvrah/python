@@ -1,6 +1,7 @@
 import tkinter
 from tkinter import *
 import tkinter.font as font
+from tkinter import messagebox
 from PIL import ImageTk, Image
 from LobbySC import Lobby
 from SettingsSC import Settings
@@ -100,13 +101,7 @@ class Menu(tkinter.Toplevel):
         self.wins_updated = False
 
     def on_closing(self):
-        self.parent.send_msg("exit", self.parent.client_socket)
-        self.parent.client_socket.close()
-        self.destroy()
-
-    # def close(self):
-    #     self.parent.deiconify()  # show parent
-    #     self.destroy()  # close and destroy this screen
-
-# M = Menu("Johnny")
-# M.mainloop()
+        if messagebox.askokcancel("Quit Game", "Do you want to quit?"):
+            self.parent.send_msg("exit", self.parent.client_socket)
+            self.destroy()
+            self.parent.client_socket.close()

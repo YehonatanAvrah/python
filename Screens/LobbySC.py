@@ -2,6 +2,8 @@ import tkinter
 import threading
 from tkinter import *
 import tkinter.font as font
+from tkinter import messagebox
+
 from PIL import ImageTk, Image
 from GameSC import Game
 
@@ -11,6 +13,8 @@ class Lobby(tkinter.Toplevel):
         super().__init__(parent)
         self.client_handler = None
         self.parent = parent  # menu
+        self.main_parent = parent.parent  # login
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.geometry("750x460")
         self.title('Lobby')
         self.format = 'utf-8'
@@ -94,12 +98,8 @@ class Lobby(tkinter.Toplevel):
         else:
             self.open_game()
 
-    def start_queue(self):
-        arr_players = []
-        for i in self.player_list:
-            arr_players.append(self.player_list.get(i))
-        players_str = ",".join(arr_players)
-        counter = 5
-        TimerLbl = StringVar()
-        TimerLbl.set(f"Waiting in queue {counter}")
-        self.open_game()
+    def on_closing(self):
+        if messagebox.askokcancel("Quit Game", "Do you want to quit?"):
+            self.main_parent.send_msg("exit", self.main_parent.client_socket)
+            self.destroy()
+            self.main_parent.client_socket.close()

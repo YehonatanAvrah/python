@@ -1,6 +1,6 @@
 import tkinter
 from tkinter import *
-from tkinter import ttk
+from tkinter import ttk, messagebox
 import tkinter.font as font
 
 
@@ -10,6 +10,7 @@ class GameHistory(tkinter.Toplevel):
         self.client_handler = None
         self.parent = parent  # menu
         self.main_parent = parent.parent  # login
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.geometry("750x600")
         self.title('Games History')
         self.format = 'utf-8'
@@ -67,4 +68,10 @@ class GameHistory(tkinter.Toplevel):
     def refresh_table(self):
         self.table.delete(*self.table.get_children())
         self.history_tbl()
+
+    def on_closing(self):
+        if messagebox.askokcancel("Quit Game", "Do you want to quit?"):
+            self.main_parent.send_msg("exit", self.main_parent.client_socket)
+            self.destroy()
+            self.main_parent.client_socket.close()
 

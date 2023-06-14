@@ -3,6 +3,8 @@ import tkinter
 from tkinter import *
 import tkinter.font as font
 from PIL import ImageTk, Image
+from tkinter import messagebox
+
 
 SIZE = 5
 
@@ -16,6 +18,7 @@ class Register(tkinter.Toplevel):
         self.title('Registration')
         self.format = 'utf-8'
         self.resizable(width=False, height=False)
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         # ====================BG and Icon======================
         # self.icon = PhotoImage(file="../Photos/SAL_icon.png")
@@ -142,3 +145,9 @@ class Register(tkinter.Toplevel):
     def close(self):
         self.parent.deiconify()
         self.destroy()
+
+    def on_closing(self):
+        if messagebox.askokcancel("Quit Game", "Do you want to quit?"):
+            self.parent.send_msg("exit", self.parent.client_socket)
+            self.destroy()
+            self.parent.client_socket.close()

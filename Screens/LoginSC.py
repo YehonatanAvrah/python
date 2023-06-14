@@ -93,6 +93,7 @@ class MainWindow(tkinter.Tk):  # create a window
         if messagebox.askokcancel("Quit Game", "Do you want to quit?"):
             self.send_msg("exit", self.client_socket)
             self.destroy()
+            self.client_socket.close()
 
     def email_enter(self, event):
         self.EntEmail.delete(0, END)

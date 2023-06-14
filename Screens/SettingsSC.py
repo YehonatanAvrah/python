@@ -11,7 +11,7 @@ class Settings(tkinter.Toplevel):
         self.client_handler = None
         self.parent = parent  # menu
         self.main_parent = parent.parent  # login
-        # self.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.geometry("950x850")
         self.title('Settings')
         self.format = 'utf-8'
@@ -70,9 +70,10 @@ class Settings(tkinter.Toplevel):
         self.destroy()  # close and destroy this screen
 
     def on_closing(self):
-        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+        if messagebox.askokcancel("Quit Game", "Do you want to quit?"):
             self.main_parent.send_msg("exit", self.main_parent.client_socket)
             self.destroy()
+            self.main_parent.client_socket.close()
 
     def backgroundcolor(self):
         color = askcolor()[1]

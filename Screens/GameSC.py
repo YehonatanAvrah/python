@@ -3,6 +3,8 @@ import random
 from tkinter import *
 import threading
 import tkinter.font as font
+from tkinter import messagebox
+
 from PIL import ImageTk, Image
 from GameOverSC import Winning_Screen
 
@@ -13,6 +15,7 @@ class Game(tkinter.Toplevel):
         self.client_handler = None
         self.parent = parent  # lobby
         self.main_parent = parent.parent.parent  # login
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.geometry("1600x1010")
         self.title('Game Screen - Snakes And Ladders')
         self.format = 'utf-8'
@@ -324,3 +327,9 @@ class Game(tkinter.Toplevel):
                 self.open_win_screen()
             # self.handle_recv_dice_result()
             # self.after(350, self.open_win_screen)
+
+    def on_closing(self):
+        if messagebox.askokcancel("Quit Game", "Do you want to quit?"):
+            self.main_parent.send_msg("exit", self.main_parent.client_socket)
+            self.destroy()
+            self.main_parent.client_socket.close()
