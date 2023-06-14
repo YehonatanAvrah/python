@@ -81,13 +81,13 @@ class Game(tkinter.Toplevel):
         self.pawn1_resize = self.pawn1.resize((50, 50), Image.Resampling.LANCZOS)
         self.pawn_red = ImageTk.PhotoImage(self.pawn1_resize)
         self.player_1 = self.canvas.create_image(120, 925, image=self.pawn_red, anchor=S)
-        self.player_pos1 = 90  # set the current position of the player1
+        self.player_pos1 = 0  # set the current position of the player1, 90 for checking
 
         self.pawn2 = Image.open("../Photos/blue_pawn.png")
         self.pawn2_resize = self.pawn2.resize((50, 50), Image.Resampling.LANCZOS)
         self.pawn_blue = ImageTk.PhotoImage(self.pawn2_resize)
         self.player_2 = self.canvas.create_image(180, 925, image=self.pawn_blue, anchor=S)
-        self.player_pos2 = 90  # set the current position of the player2
+        self.player_pos2 = 0  # set the current position of the player2, 90 for checking
 
     def get_opp_name(self):
         try:
