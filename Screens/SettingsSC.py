@@ -59,7 +59,7 @@ class Settings(tkinter.Toplevel):
         self.btn_close.place(x=155, y=20)
         self.btn_color = Button(self.canvas, text="Change Background", command=self.backgroundcolor,
                                 background="light blue", font=self.LblFont)
-        self.btn_color.place(x=300, y=20)
+        self.btn_color.place(x=350, y=20)
 
     def open_login(self):
         self.main_parent.deiconify()  # show main parent

@@ -15,6 +15,7 @@ class Menu(tkinter.Toplevel):
         self.geometry("750x600")
         self.title('Main Menu')
         self.wins_updated = True
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.bind("<Visibility>", self.on_visibility_change)
         self.format = 'utf-8'
         self.bg_color = '#AC94F4'
@@ -98,10 +99,14 @@ class Menu(tkinter.Toplevel):
     def reset_wins_updated(self):
         self.wins_updated = False
 
+    def on_closing(self):
+        self.parent.send_msg("exit", self.parent.client_socket)
+        self.parent.client_socket.close()
+        self.destroy()
+
     # def close(self):
     #     self.parent.deiconify()  # show parent
     #     self.destroy()  # close and destroy this screen
 
 # M = Menu("Johnny")
 # M.mainloop()
-

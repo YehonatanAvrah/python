@@ -13,11 +13,11 @@ class Game(tkinter.Toplevel):
         self.client_handler = None
         self.parent = parent  # lobby
         self.main_parent = parent.parent.parent  # login
-        self.geometry("1800x1010")
+        self.geometry("1600x1010")
         self.title('Game Screen - Snakes And Ladders')
         self.format = 'utf-8'
         self.bg_color = self.parent.parent.bg_color
-        self.canvas = Canvas(self, width=1800, height=1010, bg=self.bg_color)
+        self.canvas = Canvas(self, width=1600, height=1010, bg=self.bg_color)
         self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)

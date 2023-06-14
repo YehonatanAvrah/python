@@ -11,35 +11,44 @@ class Lobby(tkinter.Toplevel):
         super().__init__(parent)
         self.client_handler = None
         self.parent = parent  # menu
-        self.geometry("750x600")
+        self.geometry("750x460")
         self.title('Lobby')
         self.format = 'utf-8'
         self.bg_color = self.parent.bg_color
-        self.canvas = Canvas(self, width=750, height=600, bg=self.bg_color)
+        self.canvas = Canvas(self, width=750, height=460, bg=self.bg_color)
         self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
+        self.LblFontUnder = font.Font(family='Comic Sans MS', weight="bold", size=15, underline=True)
         self.Username = str(parent.Username)  # self.parent.UserData.get()
         self.create_gui()
 
-        # ====================Logo and Icon======================
-        # self.icon = PhotoImage(file="../Photos/SAL_icon.png")
-        # self.iconphoto(False, self.icon)
+        # ====================Logo======================
         self.logo_photo = Image.open("../Photos/SAL_Logo.png")
-        self.logo = ImageTk.PhotoImage(self.logo_photo)
-        self.canvas.create_image(15, 120, image=self.logo, anchor=NW)
+        self.resize_logo = self.logo_photo.resize((600, 300), Image.Resampling.LANCZOS)
+        self.logo = ImageTk.PhotoImage(self.resize_logo)
+        self.canvas.create_image(235, 165, image=self.logo, anchor=NW)
 
     def create_gui(self):
         # ====================Labels======================
-        self.canvas.create_text(85, 20, text="Party Members", fill="black", font=self.LblFont)
-        self.wait = self.canvas.create_text(300, 450, text="Waiting For Players...", fill="Lime", font=self.LblFont)
-        self.timer = 5
-        #self.timer.set("5")
-        self.TimerLbl = Label(self.canvas, text=self.timer)
-        self.TimerLbl.place(x=630, y=15)
-        self.player_list = Listbox(self, font=self.LblFont)
+        self.canvas.create_text(90, 125, text="Party Members", fill="black", font=self.LblFontUnder)
+        self.canvas.create_oval(280, 40, 480, 180, fill="white", outline="black", width=5)
+        self.canvas.create_oval(358, 202, 368, 212, fill="white", outline="black", width=3)
+        self.canvas.create_oval(345, 190, 355, 200, fill="white", outline="black", width=3)
+        self.wait = self.canvas.create_text(380, 110, text="Waiting\n For\n Players...", fill="Lime", font=self.LblFont)
+
+        self.player_list = Listbox(self, font=self.LblFont, height=5, width=15, bg="black", fg="white")
         self.player_list.insert(1, self.Username)
-        self.player_list.place(x=25, y=40)
+        self.player_list.place(x=15, y=150)
+
+        self.img = Image.open("../Photos/snake_timer.png")
+        self.resize = self.img.resize((115, 115), Image.Resampling.LANCZOS)
+        self.timer_img = ImageTk.PhotoImage(self.resize)
+        self.canvas.create_image(610, 25, image=self.timer_img, anchor=NW)
+
+        self.timer = 5
+        self.timer_text = self.canvas.create_text(668, 85, text="", font=("Comic Sans MS", 20, "bold"))
+
         self.handle_wait_for_player()
 
     def handle_wait_for_player(self):
@@ -77,14 +86,11 @@ class Lobby(tkinter.Toplevel):
         self.withdraw()
 
     def countdown(self):
-        # self.timer = 5  # int(self.timer)
-        # print(type(self.timer))
-        self.canvas.itemconfig(self.wait, text="Full Party, Starting Queue...")  # (self.wait, state='hidden')
-        if self.timer >= 0:
-            # self.UserData.set("Logged in successfully, Welcome back")
-            self.TimerLbl.configure(text="%d" % self.timer)
+        self.canvas.itemconfig(self.wait, text="Full Party,\n Starting Game...")  # (self.wait, state='hidden')
+        if self.timer > 0:
+            self.canvas.itemconfig(self.timer_text, text=str(self.timer))
             self.timer -= 1
-            self.TimerLbl.after(1000, self.countdown)
+            self.canvas.after(1000, self.countdown)
         else:
             self.open_game()
 

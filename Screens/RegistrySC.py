@@ -131,6 +131,8 @@ class Register(tkinter.Toplevel):
                 self.EntPass.delete(0, END)
                 self.EntConfirmPass.delete(0, END)
                 self.EntUsername.delete(0, END)
+            elif data == "Err_Recv":
+                self.SucReg.set("Server Offline")
             else:
                 self.SucReg.set(data)
             print(data)

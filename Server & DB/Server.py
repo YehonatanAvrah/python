@@ -40,19 +40,27 @@ class Server:
             print(f"[LISTENING...] Server is listening on {self.addr}")
 
             while True:
-                # Perform three-way handshake
-                print("Waiting for a client")
-                client_socket, address = self.server_socket.accept()  # create connection with client, first step: SYN
-                print("New client connected")
-                # self.send_msg("Connection with server successfully established", client_socket)
-                self.send_msg(self.public_key, client_socket)  # Second step: SYN-ACK
-                self.recv_msg(client_socket)  # Third step: ACK
-                self.conn_handler(client_socket)
-                self.count += 1
-                print(f"current amount of clients: {self.count}")
+                try:
+                    # Perform three-way handshake
+                    print("Waiting for a client")
+                    client_socket, address = self.server_socket.accept()  # create connection with client, first step: SYN
+                    print("New client connected")
+                    # self.send_msg("Connection with server successfully established", client_socket)
+                    self.send_msg(self.public_key, client_socket)  # Second step: SYN-ACK
+                    self.recv_msg(client_socket)  # Third step: ACK
+                    self.conn_handler(client_socket)
+                    self.count += 1
+                    print(f"current amount of clients: {self.count}")
+                except Exception as e:
+                    print(f"Socket error occurred: {e}")
+                    break
 
         except socket.error as e:
             print(f"Socket error occurred: {e}")
+
+        finally:
+            if self.server_socket:
+                self.server_socket.close()
 
     def encrypt(self, data):
         try:
@@ -224,7 +232,7 @@ class Server:
                     self.remove_lobby(arr[1])  # arr[1] = username
 
                 elif arr and cmd == "exit" and len(arr) == 1:
-                    print("exit")
+                    print(f"client {client_socket} left")
                     running = False  # change the variable to exit the loop
                     # server_data = "You've successfully disconnected"
                     self.count -= 1
@@ -240,6 +248,7 @@ class Server:
                 running = False
                 self.count -= 1
                 break
+        print(f"Closed: {client_socket}")
         client_socket.close()
 
     # def handle_lobby(self, username, client_socket):
@@ -352,22 +361,22 @@ class Server:
             lobby = next((lobby for lobby in self.lobbies if username in [player.name for player in lobby]), None)
             if lobby:
                 player1, player2 = lobby
-                print("0")
                 if player1.name == username:
                     self.send_msg(self.winner, player1.client_socket)
-                    print("1")
                 elif player2.name == username:
                     self.send_msg(self.winner, player2.client_socket)
-                    print("2")
         except:
             print("fail - get winner")
 
     def remove_lobby(self, username):
         try:
             lobby = next((lobby for lobby in self.lobbies if username in [player.name for player in lobby]), None)
+            print(lobby)
             if lobby:
                 self.lobbies.remove(lobby)
                 print("removed lobby")
+            else:
+                print("lobby doesn't exist")
         except:
             print("fail - remove lobby")
 

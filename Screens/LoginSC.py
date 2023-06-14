@@ -25,7 +25,7 @@ class MainWindow(tkinter.Tk):  # create a window
         self.canvas.pack(expand=YES, fill=BOTH)
         self.resizable(width=False, height=False)
         self.LblFont = font.Font(family='Comic Sans MS', weight="bold", size=15)
-        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client_socket = None
         self.public_key = None
         self.handle_thread_socket()
         self.format = 'utf-8'
@@ -154,6 +154,7 @@ class MainWindow(tkinter.Tk):  # create a window
         client_handler.start()
 
     def create_socket(self):
+        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             self.client_socket.connect(('127.0.0.1', 1956))  # first step: SYN
             self.public_key = self.recv_msg(self.client_socket)  # Second step: SYN-ACK
